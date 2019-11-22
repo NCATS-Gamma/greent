@@ -27,7 +27,7 @@
   sequence_variant   : [ 'CAID', 'HGVS', 'ROBO_VARIANT', 'DBSNP', 'CLINVARVARIANT', 'MYVARIANT_HG19', 'MYVARIANT_HG38' ]
   chemical_substance : [ 'DRUGBANK', 'PUBCHEM', 'CHEBI', 'CHEMBL','DRUG.INTERACTION', 'INCHI', 'INCHIKEY',  'PUBCHEM.COMPOUND', 'KEGG.COMPOUND', 'KEGG.DRUG', 'KEGG', 'PHAROS.DRUG', 'CTD', 'FOOD' ]
   gene_family        : [ 'PANTHER.FAMILY', 'HGNC.FAMILY' ]
-
+  food               : [  'FOODB' ]
 '@translator-registry' :
   skip_list:
     - .*diseaseontologyapi.*
@@ -83,7 +83,7 @@
         op    : mychem.get_drugcentral
     chemical_substance:
       - link  : chemical_to_chemical_class
-        op    : uberongraph.get_chemical_to_chemical
+        op    : uberongraph.get_chemical_by_chemical
       - link  : complex_to_part
         op    : gtopdb.complex_to_part
     food:
@@ -114,7 +114,7 @@
         op    : hmdb.disease_to_metabolite
     biological_process_or_activity:
       - link  : disease_to_biological_process_or_activity
-        op    : uberongraph.get_process_or_activity_by_disease
+        op    : uberongraph.get_process_by_disease
     anatomical_entity:
       - link  : disease_to_anatomical_entity
         op    : uberongraph.get_anatomy_by_disease
@@ -192,9 +192,12 @@
     disease:
       - link  : phenotype_to_disease
         op    : biolink.phenotype_get_disease
-    biological_process_or_activity:
+    biological_process:
       - link  : phenotype_to_biological_process_or_activity
-        op    : uberongraph.get_process_or_activity_by_phenotype
+        op    : uberongraph.get_process_by_phenotype
+    molecular_activity:
+      - link  : phenotype_to_biological_process_or_activity
+        op    : uberongraph.get_activity_by_phenotype
     chemical_substance:
       - link  : phenotype_to_chemical_substance
         op    : uberongraph.get_chemical_by_phenotype

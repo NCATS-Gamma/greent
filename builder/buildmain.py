@@ -95,7 +95,7 @@ def build_spec(spec_sequence, start_name, start_id, end_name=None, end_id=None):
     return out
 
 def build_step(spec, name=None, curie=None, id=0, eid=0):
-    if name and curie:
+    if curie:
         node = {
             "type": spec,
             "name": name,
@@ -157,11 +157,11 @@ def run(pathway, start_name, start_id, end_name, end_id, supports, config, ident
     else:
         spec = specs_from_array_of_ids(pathway, identifier_list ,end_name, end_id)
         disconnected_graph = True
+    print(spec)
     q = Question(spec)
-
     rosetta = setup(config)
     programs = q.compile(rosetta, disconnected_graph= disconnected_graph)
-
+    
     for p in programs:
         p.run_program()
 

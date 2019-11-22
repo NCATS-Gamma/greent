@@ -2,7 +2,7 @@ from greent.util import LoggingUtil
 from greent.service import Service
 from greent import node_types
 from greent.graph_components import KNode, LabeledID, KEdge
-
+from greent.util import Text
 from csv import reader
 import logging
 import requests
@@ -47,7 +47,8 @@ class FooDB(Service):
 
         try:
             # get the contents records using the food id
-            contents: list = requests.get(f"{self.url}contents_food_id/{in_food_node.id}").json()
+            in_food_id = Text.un_curie(in_food_node.id)
+            contents: list = requests.get(f"{self.url}contents_food_id/{in_food_id}/").json()
 
             # loop through the contents returned
             for content in contents:
@@ -61,13 +62,13 @@ class FooDB(Service):
                 # what type of chemical substance are we working
                 if content_type == 'Compound':
                     # use the source id in the contents record to get the compounds record
-                    compound: dict = requests.get(f"{self.url}compounds_id/{content['source_id']}").json()[0]
+                    compound: dict = requests.get(f"{self.url}compounds_id/{content['source_id']}/").json()[0]
 
                     # inspect the compound row and return the needed data
                     good_row, food_id, node_properties = self.check_compound_row(compound)
                 elif content_type == 'Nutrient':
                     # use the source id in the contents record to get the nutrient record
-                    nutrient: dict = requests.get(f"{self.url}nutrients_id/{content['source_id']}").json()[0]
+                    nutrient: dict = requests.get(f"{self.url}nutrients_id/{content['source_id']}/").json()[0]
 
                     # inspect the compound row
                     good_row, food_id, node_properties = self.check_nutrient_row(nutrient)
@@ -90,12 +91,12 @@ class FooDB(Service):
 
                 # create the edge
                 edge: KEdge = self.create_edge(source_node=in_food_node,
-                                               target_node=chemical_substance_node,
-                                               provided_by='foodb.food_to_chemical_substance',
-                                               input_id=in_food_node.id,
-                                               predicate=predicate,
-                                               properties=edge_properties
-                                               )
+                                                target_node=chemical_substance_node,
+                                                provided_by='foodb.food_to_chemical_substance',
+                                                input_id=in_food_node.id,
+                                                predicate=predicate,
+                                                properties=edge_properties
+                                                )
 
                 # append the edge/node pair to the returned data array
                 rv.append((edge, chemical_substance_node))
@@ -224,11 +225,12 @@ class FooDB(Service):
 
                 # index into the array to the HGVS position
                 id_index = header_line.index('id')
+                food_name_index = header_line.index('name')
 
                 # for each line (skipping the first header line)
                 for line in lines:
                     # add the food db id to the list
-                    food_list.append(line[id_index])
+                    food_list.append((line[id_index], line[food_name_index]))
 
             # close the input file
             inFH.close()

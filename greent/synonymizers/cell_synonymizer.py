@@ -11,6 +11,9 @@ def synonymize(node,gt):
     new_syns = set()
     for csim in currentsynonyms:
         if csim.label is None or csim.label == '':
-            label = gt.uberongraph.cell_get_cellname(csim.identifier)[0]['cellLabel']
+            response = gt.uberongraph.cell_get_cellname(csim.identifier)
+            label = ''
+            if response and len(response) and 'cell_label'  in response[0]:
+                label = response[0]               
             new_syns.add(LabeledID(identifier=csim.identifier, label=label))
     return new_syns

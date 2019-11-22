@@ -43,10 +43,10 @@ def load_gtex_knowledge(rosetta: object, gtex_filenames=[]):
     gtex_data_directory = f'{os.environ["ROBOKOP_HOME"]}/gtex_knowledge/'
 
     # assign the name of the GTEx data file
-    associated_file_names = gtex_filenames if gtex_filenames else [default_gtex_file]
+    #associated_file_names = gtex_filenames if gtex_filenames else [default_gtex_file]
 
     # load up all the GTEx data
-    rv = gtb.load(gtex_data_directory, associated_file_names)
+    rv = gtb.load(gtex_data_directory, process_raw_data=False)
 
     # check the return, output error if found
     if rv is not None:

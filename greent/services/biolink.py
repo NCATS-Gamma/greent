@@ -80,8 +80,8 @@ class Biolink(Service):
         for association in associations:
             # We would like to include edges that are direct links, if we have entity A we've queried for we also get other subjects that have (New_subject)-is_a-> A and relations returned for those,
             # so we end up having direct relations of subclasses  being pushed up to parent classes, so check to see if subject is actually the one we asked for
-            if association['subject']['id'] != input_node.id:
-                continue
+            # if association['subject']['id'] != input_node.id:
+                # continue
             pubs = []
             if 'publications' in association and association['publications'] is not None:
                 for pub in association['publications']:
@@ -187,8 +187,8 @@ class Biolink(Service):
         if response is None:
             return []
         edges_nodes = self.process_associations(response, 'gene_get_process_or_function', node_types.BIOLOGICAL_PROCESS_OR_ACTIVITY, input_id, url,gene)
-        process_or_function_results = list(filter(lambda x: self.go.is_biological_process(x[1].id) or
-                                                  self.go.is_molecular_function(x[1].id), edges_nodes))
+        process_or_function_results = list(filter(lambda x: self.go.is_biological_process(x[1]) or
+                                                  self.go.is_molecular_function(x[1]), edges_nodes))
         return process_or_function_results
 
     def gene_get_pathways(self, gene):

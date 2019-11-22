@@ -631,3 +631,6 @@ class UberonGraphKS(Service):
 
     def get_anatomy_by_phenotype_graph (self, pheno_node):
         return self.get_out_by_in(pheno_node,node_types.ANATOMICAL_ENTITY,['HP'])
+
+    def get_chemical_by_chemical (self, chem_node):
+        return self.get_out_by_in(chem_node,node_types.CHEMICAL_SUBSTANCE,['CHEBI'])

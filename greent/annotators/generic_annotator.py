@@ -50,11 +50,7 @@ class GenericAnnotator(Annotator):
                 'synonyms': syns
             })
         def get_good_name(self, node):
-            logger.debug(f'getting good name for node: {node} ({node.name})')
-            import inspect
-            logger.info(inspect.stack())
-            exit()
-            raise Exception
+            logger.debug(f'getting good name for node: {node} ({node.name})')            
             key = f"node_name({node.id})"
             cached_name = self.rosetta.cache.get(key)
             if not cached_name or cached_name == '':

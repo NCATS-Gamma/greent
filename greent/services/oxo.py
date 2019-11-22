@@ -30,7 +30,7 @@ class OXO(Service):
         self.curies.add('MESH')
 
     def is_valid_curie_prefix(self, cp):
-        return cp in self.curies or cp.upper() in self.curies
+        return cp != None and  (cp in self.curies or cp.upper() in self.curies)
 
     def request(self, url, obj):
         return requests.post(self.url,

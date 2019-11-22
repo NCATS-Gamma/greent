@@ -89,7 +89,7 @@ def get_identifiers(input_type,rosetta):
         print("Pull genes")
         data = pull_via_ftp('ftp.ebi.ac.uk', '/pub/databases/genenames/new/json', 'hgnc_complete_set.json')
         hgnc_json = loads( data.decode() )
-        hgnc_genes = hgnc_json['response']['docs'][:10]
+        hgnc_genes = hgnc_json['response']['docs']
         for gene_dict in hgnc_genes:
             symbol = gene_dict['symbol']
             lids.append( LabeledID(identifier=gene_dict['hgnc_id'], label=symbol) )
@@ -191,8 +191,8 @@ def get_identifiers(input_type,rosetta):
 
     elif input_type == node_types.FOOD:
         #get the full list of Food ids here here~~~~~
-        lids = list (map( lambda x: LabeledID(x[0], x[1]), requests.get('http://phil-centos.edc.renci.org:4001/foods_examples/').json()))
-        print(lids)
+        foods = rosetta.core.foodb.load_all_foods('foods.csv')
+        lids = list (map( lambda x: LabeledID(f'FOODB:{x[0]}',x[1]), foods))
     elif input_type == node_types.SEQUENCE_VARIANT:
         # grab every variant already in the graph
         lids = get_all_variant_ids_from_graph(rosetta)

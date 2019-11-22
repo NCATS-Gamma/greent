@@ -58,7 +58,8 @@ class Onto(CachedService):
         return self.get(f"{self.url}/synonyms/{identifier}")
     def lookup(self,identifier):
         obj = self.get(f"{self.url}/lookup/{identifier}")
-        return [ ref["id"] for ref in obj['refs'] ] if 'refs' in obj else []
+        if obj == None : logger.warning(f'Error: {self.url}/lookup/{identifier} returned {None} ')
+        return [ ref["id"] for ref in obj['refs'] ] if obj and 'refs' in obj else []
 
     def get_anscestors(self, identifier):
         return self.get(f"{self.url}/superterms/{identifier}")

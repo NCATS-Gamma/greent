@@ -3,7 +3,7 @@ from greent.services.foodb import FooDB
 from greent.servicecontext import ServiceContext
 from greent.graph_components import KNode
 from greent import node_types
-
+import os
 
 @pytest.fixture()
 def foodb(rosetta):
@@ -13,14 +13,16 @@ def foodb(rosetta):
 
 def test_load_foods(foodb: FooDB):
     # load up the foods.csv file
-    results = foodb.load_all_foods('C:/Phil/Work/Informatics/Robokop/FooDB/FooDB_rawdata/foods.csv')
+    home = os.environ.get('ROBOKOP_HOME')
+    results = foodb.load_all_foods(f'{home}/robokop-interfaces/crawler/foods.csv')
 
     assert results
 
 
 def test_food_to_chemical_substance(foodb: FooDB):
     # load up the foods.csv file
-    food_list = foodb.load_all_foods('C:/Phil/Work/Informatics/Robokop/FooDB/FooDB_rawdata/foods.csv')
+    home = os.environ.get('ROBOKOP_HOME')
+    food_list = foodb.load_all_foods(f'{home}/robokop-interfaces/crawler/foods.csv')
 
     # create a food node
     food_node = KNode(id=food_list[1], type=node_types.FOOD)

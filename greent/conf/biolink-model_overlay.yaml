@@ -696,6 +696,9 @@ slots:
       - core#transitively:connected:to
       - core#transitively:distally:connected:to
       - core#transitively:proximally:connected:to
+      - BSPO:0015009
+      - BSPO:0015012
+      - bspo#parallel:to
 
 
     #In translator_minimal now, here for hetio
@@ -761,11 +764,17 @@ slots:
       - CTD:marker/mechanism
       - CTD:positivecorrelation
       - RO:0003304
+      - RO:0004013
+      - RO:0004015
+      - RO:0004012
+      - RO:0004014
+      - RO:0004016
 
   treats:
     mappings:
       - CTD:therapeutic
       - CTD:negativecorrelation
+      - mondo#disease:responds:to
 
   produces:
     mappings:
@@ -994,6 +1003,7 @@ slots:
       - RO:0004030
       - RO:0004017
       - mondo#disease:has:basis:in:development:of
+      - mondo#disease:has:basis:in:accumulation:of
       
   causes adverse event:
     description: >-
