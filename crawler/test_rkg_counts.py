@@ -9,10 +9,11 @@ from neo4j.v1 import GraphDatabase
 # Test module for a newly built robokop KG.
 #
 # Has 2 components. In one, we compare the numbers of different kinds of edges to those that
-# occured in the previous graph.  The new counts are stored for later use
+# occured in the previous graph.  The new counts are stored for later use.  This test file
+# (test_rkg_counts.py) covers this case.
 #
 # The second component does some sanity checks to see that labels make sense.  This kind of stuff
-# will mostly be subsumed into KGX at some point in the future
+# will mostly be subsumed into KGX at some point in the future, but for now is in test_rkg_values.py
 #
 ###
 
