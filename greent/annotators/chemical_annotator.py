@@ -79,7 +79,7 @@ class ChemicalAnnotator(Annotator):
                 if prop_name in keys_of_interest:
                     # handle the smiles value.
                     if prop_name == 'smiles':
-                        # save the cannonical, original and simple versions of the smiles
+                        # save the canonical, original and simple versions of the smiles
                         prop_value, extract[keys_of_interest['orig_smiles']], extract[keys_of_interest['simple_smiles']] = self.convert_value_to_smiles(prop_value)
 
                     extract[keys_of_interest[prop_name]] = prop_value
@@ -216,7 +216,7 @@ class ChemicalAnnotator(Annotator):
 
                         # handle the smiles value.
                         if label == 'SMILES':
-                            # save the cannonical, original and simple versions of the smiles
+                            # save the canonical, original and simple versions of the smiles
                             prop_value, result[keys_of_interest['orig_smiles']], result[keys_of_interest['simple_smiles']] = self.convert_value_to_smiles(prop_value)
 
                         # save the value
@@ -228,24 +228,33 @@ class ChemicalAnnotator(Annotator):
     #################
     # convert_to_smiles_values(self, orig_smiles)
     # return
-    #   'cannonical_smiles', the canonical smiles
+    #   'canonical_smiles', the canonical smiles
     #   'orig_smiles' the untouched raw data element value from the source
     #   'simple_smiles' the simplified smiles
     ###############
-    def convert_to_smiles_values(self, orig_smiles):
-        # load the raw smiles value into RDKit and get the canonical version
-        mol = Chem.MolFromSmiles(orig_smiles)
-        cannonical_smiles = Chem.MolToSmiles(mol)
+    def convert_to_smiles_values(self, orig_smiles: str) -> (str, str, str):
+        try:
+            # did we get a good value
+            if type(orig_smiles) == type(str) and orig_smiles != '':
+                # load the raw smiles value into RDKit and get the canonical version
+                mol = Chem.MolFromSmiles(orig_smiles)
+                canonical_smiles = Chem.MolToSmiles(mol)
 
-        # simplify the smiles value
-        molp = rdMolStandardize.ChargeParent(mol)
-        RemoveStereochemistry(molp)
-        simple_smiles = Chem.MolToSmiles(molp)
+                # simplify the smiles value
+                molp = rdMolStandardize.ChargeParent(mol)
+                RemoveStereochemistry(molp)
+                simple_smiles = Chem.MolToSmiles(molp)
 
-        logger.debug(f'convert_to_smiles_values(): {cannonical_smiles}, {orig_smiles}, {simple_smiles}')
+                logger.debug(f'convert_to_smiles_values({orig_smiles}): {canonical_smiles}, {orig_smiles}, {simple_smiles}')
+            else:
+                logger.error(f'convert_to_smiles_values({orig_smiles}) invalid input.')
+        except Exception as e:
+            logger.error(f'convert_to_smiles_values({orig_smiles}) exception detected.')
+            logger.exception(e)
+            return '', '', ''
 
         # return to the caller
-        return cannonical_smiles, orig_smiles, simple_smiles
+        return canonical_smiles, orig_smiles, simple_smiles
 
     def extract_mychem_data(self, mychem_raw, keys_of_interest = []):
         response = {}
