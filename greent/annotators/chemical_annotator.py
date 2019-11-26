@@ -77,10 +77,12 @@ class ChemicalAnnotator(Annotator):
                 prop_name = prop_parts[0].split('/')[-1]
                 prop_value = prop_parts[1].strip('"')
                 if prop_name in keys_of_interest:
-                    # save the cannonical, original and simple versions of the smiles
-                    prop_value, extract[keys_of_interest['orig_smiles']], extract[keys_of_interest['simple_smiles']] = self.convert_value_to_smiles(prop_value)
+                    # handle the smiles value.
+                    if prop_name == 'smiles':
+                        # save the cannonical, original and simple versions of the smiles
+                        prop_value, extract[keys_of_interest['orig_smiles']], extract[keys_of_interest['simple_smiles']] = self.convert_value_to_smiles(prop_value)
 
-                extract[keys_of_interest[prop_name]] = prop_value
+                    extract[keys_of_interest[prop_name]] = prop_value
         return extract
           
     async def get_kegg_data(self, kegg_id):
@@ -213,9 +215,6 @@ class ChemicalAnnotator(Annotator):
                         prop_value = values[0] if len(values) == 1 else values
 
                         # handle the smiles value.
-                        # key 'orig_smiles' == untouched raw data element value from the source
-                        # key 'smiles' == canonical smiles
-                        # key 'simple_smiles' is the simplified smiles
                         if label == 'SMILES':
                             # save the cannonical, original and simple versions of the smiles
                             prop_value, result[keys_of_interest['orig_smiles']], result[keys_of_interest['simple_smiles']] = self.convert_value_to_smiles(prop_value)
@@ -226,6 +225,13 @@ class ChemicalAnnotator(Annotator):
             logger.error(f"got this : {pubchem_raw} for pubchem")
         return result
 
+    #################
+    # convert_to_smiles_values(self, orig_smiles)
+    # return
+    #   'cannonical_smiles', the canonical smiles
+    #   'orig_smiles' the untouched raw data element value from the source
+    #   'simple_smiles' the simplified smiles
+    ###############
     def convert_to_smiles_values(self, orig_smiles):
         # load the raw smiles value into RDKit and get the canonical version
         mol = Chem.MolFromSmiles(orig_smiles)
