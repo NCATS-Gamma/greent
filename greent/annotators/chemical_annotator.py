@@ -242,7 +242,7 @@ class ChemicalAnnotator(Annotator):
         RemoveStereochemistry(molp)
         simple_smiles = Chem.MolToSmiles(molp)
 
-        logger.info(f'convert_to_smiles_values(): {cannonical_smiles}, {orig_smiles}, {simple_smiles}')
+        logger.debug(f'convert_to_smiles_values(): {cannonical_smiles}, {orig_smiles}, {simple_smiles}')
 
         # return to the caller
         return cannonical_smiles, orig_smiles, simple_smiles
