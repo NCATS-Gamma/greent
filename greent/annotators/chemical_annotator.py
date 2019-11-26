@@ -1,10 +1,14 @@
-import requests 
+#import requests
 import logging
 from greent.annotators.annotator import Annotator
 from greent.annotators.util.async_sparql_client import TripleStoreAsync
-from greent.util import Text
+from greent.util import Text, LoggingUtil
+from rdkit import Chem
+from rdkit.Chem.MolStandardize import rdMolStandardize
+from rdkit.Chem.rdmolops import RemoveStereochemistry
 import asyncio
-logger = logging.getLogger(__name__)
+
+logger = LoggingUtil.init_logging(__name__, level=logging.DEBUG, format='medium')
 
 class ChemicalAnnotator(Annotator):
     def __init__(self, rosetta):
@@ -73,7 +77,10 @@ class ChemicalAnnotator(Annotator):
                 prop_name = prop_parts[0].split('/')[-1]
                 prop_value = prop_parts[1].strip('"')
                 if prop_name in keys_of_interest:
-                    extract[keys_of_interest[prop_name]] = prop_value
+                    # save the cannonical, original and simple versions of the smiles
+                    prop_value, extract[keys_of_interest['orig_smiles']], extract[keys_of_interest['simple_smiles']] = self.convert_value_to_smiles(prop_value)
+
+                extract[keys_of_interest[prop_name]] = prop_value
         return extract
           
     async def get_kegg_data(self, kegg_id):
@@ -202,10 +209,37 @@ class ChemicalAnnotator(Annotator):
                     label = prop['urn']['label']
                     if label in keys_of_interest:
                         values = [prop['value'][v] for v in prop['value'].keys()]
-                        result[keys_of_interest[label]] = values[0] if len(values) == 1 else values
+
+                        prop_value = values[0] if len(values) == 1 else values
+
+                        # handle the smiles value.
+                        # key 'orig_smiles' == untouched raw data element value from the source
+                        # key 'smiles' == canonical smiles
+                        # key 'simple_smiles' is the simplified smiles
+                        if label == 'SMILES':
+                            # save the cannonical, original and simple versions of the smiles
+                            prop_value, result[keys_of_interest['orig_smiles']], result[keys_of_interest['simple_smiles']] = self.convert_value_to_smiles(prop_value)
+
+                        # save the value
+                        result[keys_of_interest[label]] = prop_value
         else:
             logger.error(f"got this : {pubchem_raw} for pubchem")
         return result
+
+    def convert_to_smiles_values(self, orig_smiles):
+        # load the raw smiles value into RDKit and get the canonical version
+        mol = Chem.MolFromSmiles(orig_smiles)
+        cannonical_smiles = Chem.MolToSmiles(mol)
+
+        # simplify the smiles value
+        molp = rdMolStandardize.ChargeParent(mol)
+        RemoveStereochemistry(molp)
+        simple_smiles = Chem.MolToSmiles(molp)
+
+        logger.info(f'convert_to_smiles_values(): {cannonical_smiles}, {orig_smiles}, {simple_smiles}')
+
+        # return to the caller
+        return cannonical_smiles, orig_smiles, simple_smiles
 
     def extract_mychem_data(self, mychem_raw, keys_of_interest = []):
         response = {}
