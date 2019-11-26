@@ -233,9 +233,13 @@ class ChemicalAnnotator(Annotator):
     #   'simple_smiles' the simplified smiles
     ###############
     def convert_to_smiles_values(self, orig_smiles: str) -> (str, str, str):
+        # init return values
+        canonical_smiles = ''
+        simple_smiles = ''
+
         try:
             # did we get a good value
-            if type(orig_smiles) == type(str) and orig_smiles != '':
+            if type(orig_smiles) == type(str) and orig_smiles != None and orig_smiles != '':
                 # load the raw smiles value into RDKit and get the canonical version
                 mol = Chem.MolFromSmiles(orig_smiles)
                 canonical_smiles = Chem.MolToSmiles(mol)
@@ -246,12 +250,14 @@ class ChemicalAnnotator(Annotator):
                 simple_smiles = Chem.MolToSmiles(molp)
 
                 logger.debug(f'convert_to_smiles_values({orig_smiles}): {canonical_smiles}, {orig_smiles}, {simple_smiles}')
+            # something unexpected came in
             else:
-                logger.error(f'convert_to_smiles_values({orig_smiles}) invalid input.')
+                logger.error(f'convert_to_smiles_values() invalid input.')
+                orig_smiles = ''
         except Exception as e:
             logger.error(f'convert_to_smiles_values({orig_smiles}) exception detected.')
             logger.exception(e)
-            return '', '', ''
+            orig_smiles = ''
 
         # return to the caller
         return canonical_smiles, orig_smiles, simple_smiles
