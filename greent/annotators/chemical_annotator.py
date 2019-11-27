@@ -71,18 +71,18 @@ class ChemicalAnnotator(Annotator):
         restructures chebi raw data
         """
         extract = {}
-        if 'all_properties' in chebi_raw and 'property_value' in chebi_raw['all_properties']:
-            for prop in chebi_raw['all_properties']['property_value']:
-                prop_parts = prop.split(' ')
-                prop_name = prop_parts[0].split('/')[-1]
-                prop_value = prop_parts[1].strip('"')
-                if prop_name in keys_of_interest:
-                    # handle the smiles value.
-                    if prop_name == 'smiles':
+        if 'all_properties' in chebi_raw :
+            for property in chebi_raw['all_properties']:
+                property_key = property['property_key'].split('/')[-1]
+                values =property['property_values']
+                if property_key in keys_of_interest:
+                    prop_value = values[0] if len(values) == 1 else values
+                        # handle the smiles value.
+                    if property_key == 'smiles':
                         # save the canonical, original and simple versions of the smiles
-                        prop_value, extract[keys_of_interest['orig_smiles']], extract[keys_of_interest['simple_smiles']] = self.convert_value_to_smiles(prop_value)
-
-                    extract[keys_of_interest[prop_name]] = prop_value
+                        prop_value, extract[keys_of_interest['orig_smiles']], extract[keys_of_interest['simple_smiles']] = self.convert_to_smiles_values(prop_value)
+                    extract[keys_of_interest[property_key]] = prop_value
+    
         return extract
           
     async def get_kegg_data(self, kegg_id):
@@ -217,7 +217,7 @@ class ChemicalAnnotator(Annotator):
                         # handle the smiles value.
                         if label == 'SMILES':
                             # save the canonical, original and simple versions of the smiles
-                            prop_value, result[keys_of_interest['orig_smiles']], result[keys_of_interest['simple_smiles']] = self.convert_value_to_smiles(prop_value)
+                            prop_value, result[keys_of_interest['orig_smiles']], result[keys_of_interest['simple_smiles']] = self.convert_to_smiles_values(prop_value)
 
                         # save the value
                         result[keys_of_interest[label]] = prop_value
@@ -239,7 +239,7 @@ class ChemicalAnnotator(Annotator):
 
         try:
             # did we get a good value
-            if type(orig_smiles) == type(str) and orig_smiles != None and orig_smiles != '':
+            if  isinstance(orig_smiles, str) and orig_smiles != None and orig_smiles != '':
                 # load the raw smiles value into RDKit and get the canonical version
                 mol = Chem.MolFromSmiles(orig_smiles)
                 canonical_smiles = Chem.MolToSmiles(mol)
