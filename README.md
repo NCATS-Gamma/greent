@@ -107,7 +107,7 @@ match (m)--(n) return *
 ```
 Query a particular path:
 ```
-MATCH (n:named_thing)-[a]->(d:disease)-[b]->(g:gene) RETURN *
+MATCH (n:Concept{name:'named_thing')-[a]->(d:Concept{name:'disease'})-[b]->(g:Concept{name:'gene'}) RETURN *
 ```
 In the returned graph, nodes are biolink-model concepts and edges contain attributes indicating the service to invoke. 
 
