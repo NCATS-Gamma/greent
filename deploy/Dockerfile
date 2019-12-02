@@ -1,9 +1,9 @@
 # This Dockerfile is used to build ROBOKOP
 
-FROM python:3.6.6-stretch
+FROM continuumio/miniconda3
 
 LABEL maintainer="patrick@covar.com"
-ENV REFRESHED_AT 2018-05-03
+ENV REFRESHED_AT 2019-11-27
 
 ENV LANG=C.UTF-8 \
     LC_ALL=C.UTF-8
@@ -11,8 +11,10 @@ ENV LANG=C.UTF-8 \
 ## Install basic tools
 RUN apt-get update
 RUN apt-get install -yq \
-    vim
-
+    vim \ 
+    gcc \
+    zlib1g-dev
+RUN conda install -y -c rdkit rdkit=2019.09.1
 ## Set up home directory
 ARG UID=1000
 ARG GID=1000

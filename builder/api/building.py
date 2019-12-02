@@ -236,6 +236,7 @@ class NormalizeAnswerSet(Resource):
                         knowledge_graph:
                             nodes:
                               - id: MONDO:0005737
+                              - type: ["disease"]
                             edges: []
             required: true
         responses:
