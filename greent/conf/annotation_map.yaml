@@ -38,7 +38,7 @@ ChemicalAnnotator:
         - smiles:
             source: "SMILES"
             data_type: string
-        - pubchhem.orig_smiles:
+        - pubchem.orig_smiles:
             source: "orig_smiles"
             data_type: string
         - simple_smiles:
@@ -113,7 +113,6 @@ ChemicalAnnotator:
         - simple_smiles:
             source: "simple_smiles"
             data_type: string
-
     MYCHEM:
         url: "https://mychem.info/v1/chem/"
         keys:
