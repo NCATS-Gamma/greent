@@ -295,7 +295,7 @@ def label_meshes(concord):
 
 def label_pubchem(concord, refresh = False):
     if refresh:
-        f_name =  'CID-Synonym-filtered.gz'
+        f_name =  'CID-IUPAC.gz'
         data = pull_via_ftp('ftp://ftp.ncbi.nlm.nih.gov','/pubchem/Compound/Extras/', f_name)
         with open(f_name, 'wb') as outf:
             outf.write(data)
