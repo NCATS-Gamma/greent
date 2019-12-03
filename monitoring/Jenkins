@@ -1,0 +1,24 @@
+pipeline {
+    agent {
+        dockerfile true
+    }
+    triggers {
+        cron ('*/1 * * * *')
+    }
+    parameters {
+        string(name: 'TEST_MONITOR_FILE', defaultValue: '', description: 'The monitoring test file to run'
+    }
+    stages {
+        stage('Test') {
+            sh 'pytest ${params.TEST_MONITOR_FILE}'
+        }
+    }
+    post {
+        success {
+            echo "Everything seems good."
+        }
+        failure {
+            echo "That didn't go well."
+        }
+    }
+}
