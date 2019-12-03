@@ -24,12 +24,6 @@ def driver():
     auth=("neo4j", os.environ['NEO4J_PASSWORD'])
     return GraphDatabase.driver(url, auth=auth)
 
-
-#Return the previous counts
-#@pytest.fixture(scope="module")
-#def previous():
-#    return (get_prev('nodedata'),get_prev('edgedata'))
-
 def get_most_recent(currdir, sname):
     files = os.listdir(currdir)
     prev_stats = list(filter(lambda x: x.startswith(sname), files))
