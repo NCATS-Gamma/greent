@@ -68,6 +68,8 @@ Optionally you can load our latest build of the knowledge graph available at [Ro
 [robokop-interfaces/deploy/graph] $ cd <workspace>/robokop-interfaces/ 
 ```
 
+#####NOTE: After building or loading the graph run `docker exec -it interfaces python robokop-interfaces/scripts/setup_neo4j_index.py` 
+
 ### Cache
 Start the Redis container.
 ```

@@ -6,7 +6,7 @@ pipeline {
         cron ('*/1 * * * *')
     }
     parameters {
-        string(name: 'TEST_MONITOR_FILE', defaultValue: '', description: 'The monitoring test file to run'
+        string(name: 'TEST_MONITOR_FILE', defaultValue: '', description: 'The monitoring test file to run')
     }
     stages {
         stage('Test') {
