@@ -1,6 +1,10 @@
 pipeline {
     agent {
-        dockerfile true
+        dockerfile {
+            filename 'Dockerfile.build'
+            dir 'monitoring'
+            label 'robokop-test-image'            
+        }
     }
     triggers {
         cron ('*/1 * * * *')
