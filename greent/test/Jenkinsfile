@@ -6,15 +6,15 @@ pipeline {
             args "-v ${env.WORKSPACE}:${ROBOKOP_HOME}/robokop-interfaces --entrypoint=''"
         }
     }
-    stage ('RUN service tests') {
+    stages {
         stage ('setup env') {
             steps {
-                sh 'source robokop-interfaces/deploy/setenv.sh'
+                sh 'source deploy/setenv.sh'
             }
         } 
         stage ('run tests') {
             steps {
-                sh 'pytest robokop-interfaces/greent/test'
+                sh 'pytest greent/test'
             }
         }
     }
