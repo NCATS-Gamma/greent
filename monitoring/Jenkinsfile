@@ -9,8 +9,10 @@ pipeline {
         string(name: 'TEST_MONITOR_FILE', defaultValue: '', description: 'The monitoring test file to run')
     }
     stages {
-        stage('Test') {
-            sh 'pytest ${params.TEST_MONITOR_FILE}'
+        stage ('Test') {
+            steps {
+                sh 'pytest ${params.TEST_MONITOR_FILE}'
+            } 
         }
     }
     post {
