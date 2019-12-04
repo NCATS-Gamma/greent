@@ -3,7 +3,7 @@ pipeline {
         dockerfile {
             filename 'Dockerfile'
             dir 'deploy'
-            args "-v ${env.WORKSPACE}:${ROBOKOP_HOME}/robokop-interfaces"
+            args "-v ${env.WORKSPACE}:${ROBOKOP_HOME}/robokop-interfaces --entrypoint=''"
         }
     }
     stage ('RUN service tests') {
