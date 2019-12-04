@@ -53,7 +53,7 @@ pipeline {
                 }
                 stage ('Monitoring Pubmed Cache') {
                     steps {
-                        sh "pytest monitoring/${PUBMED_CACHE}"
+                        sh "pytest monitoring/${TEST_PUBMED_CACHE}"
                     }
                     post {
                         failure {
