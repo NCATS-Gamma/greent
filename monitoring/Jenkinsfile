@@ -14,6 +14,9 @@ pipeline {
     stages {
         stage ('Test') {
             steps {
+                sh "ls"
+                sh "ls /"
+                sh "hostname"
                 sh "pytest ${params.TEST_MONITOR_FILE}"
             } 
         }
