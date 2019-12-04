@@ -8,7 +8,7 @@ pipeline {
     triggers {
         cron ('*/5 * * * *')
     }
-    enviroment {
+    environment {
         TEST_NEO4J = 'test_neo4j_monitor.py'
         TEST_OMNICORP = 'test_omnicorp_monitoring.py'
         TEST_REDIS = 'test_redis_monitor.py'
