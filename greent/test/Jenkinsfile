@@ -1,0 +1,21 @@
+pipeline {
+    agent {
+        dockerfile {
+            filename 'Dockerfile'
+            path 'deploy'
+            args "-v ${env.WORKSPACE}:${ROBOKOP_HOME}/robokop-interfaces"
+        }
+    }
+    stage ('RUN service tests') {
+        stage ('setup env') {
+            steps {
+                sh 'source robokop-interfaces/deploy/setenv.sh'
+            }
+        } 
+        stage ('run tests') {
+            steps {
+                sh 'pytest robokop-interfaces/greent/test'
+            }
+        }
+    }
+}
