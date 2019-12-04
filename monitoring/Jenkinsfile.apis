@@ -2,7 +2,7 @@ pipeline {
     agent {
         dockerfile {
             filename 'Dockerfile'
-            path 'deploy'
+            dir 'deploy'
             args "-v ${env.WORKSPACE}:${ROBOKOP_HOME}/robokop-interfaces"
         }
     }
