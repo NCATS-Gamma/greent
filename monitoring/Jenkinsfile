@@ -1,9 +1,8 @@
 pipeline {
     agent {
         dockerfile {
-            filename 'Dockerfile.build'
+            filename 'Dockerfile'
             dir 'monitoring'
-            label 'robokop-test-image'            
         }
     }
     triggers {
