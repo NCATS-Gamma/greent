@@ -8,15 +8,22 @@ pipeline {
     triggers {
         cron ('*/5 * * * *')
     }
-    parameters {
-        string(name: 'TEST_MONITOR_FILE', defaultValue: '', description: 'The monitoring test file to run')
+    enviroment {
+        TEST_NEO4J = 'test_neo4j_monitor.py'
+        TEST_OMNICORP = 'test_omnicorp_monitoring.py'
+        TEST_REDIS = 'test_redis_monitor.py'
+        TEST_PUBMED_CACHE = 'test_pubmed_cache.py'
+        TEST_MESSENGER = 'test_messenger.py'
+        TEST_BUILDER = 'test_builder_api.py'
+        TEST_RANKER = 'test_ranker_api.py'
+        TEST_MANAGER = 'test_manager.py'
     }
     stages {
         stage ('Run Tests') {
             parallel {
                 stage ('Monitoring Neo4j') {
                     steps {
-                        sh "pytest monitoring/${params.TEST_NEO4J}"
+                        sh "pytest monitoring/${TEST_NEO4J}"
                     }
                     post {
                         failure {
@@ -26,7 +33,7 @@ pipeline {
                 }
                 stage ('Monitoring main Redis') {
                     steps {
-                        sh "pytest monitoring/${params.TEST_REDIS}"
+                        sh "pytest monitoring/${TEST_REDIS}"
                     } 
                     post {
                         fail {
@@ -36,7 +43,7 @@ pipeline {
                 }
                 stage ('Monitoring Omnicorp') {
                     steps {
-                        sh "pytest monitoring/${params.TEST_OMNICORP}"
+                        sh "pytest monitoring/${TEST_OMNICORP}"
                     }
                     post {
                         fail {
@@ -46,7 +53,7 @@ pipeline {
                 }
                 stage ('Monitoring Pubmed Cache') {
                     steps {
-                        sh "pytest monitoring/${params.PUBMED_CACHE}"
+                        sh "pytest monitoring/${PUBMED_CACHE}"
                     }
                     post {
                         fail {
