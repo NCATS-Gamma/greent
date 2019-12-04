@@ -14,7 +14,7 @@ pipeline {
     stages {
         stage ('Test') {
             steps {
-                sh 'pytest ${params.TEST_MONITOR_FILE}'
+                sh "pytest ${params.TEST_MONITOR_FILE}"
             } 
         }
     }
