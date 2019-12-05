@@ -3,7 +3,7 @@ pipeline {
         dockerfile {
             filename 'Dockerfile'
             dir 'deploy'
-            args "-v ${env.WORKSPACE}:${ROBOKOP_HOME}/robokop-interfaces --entrypoint=''"
+            args "-v ${env.WORKSPACE}:/home/murphy/robokop-interfaces --entrypoint='' --network=host"
         }
     }
     triggers {

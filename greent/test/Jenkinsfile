@@ -3,13 +3,13 @@ pipeline {
         dockerfile {
             filename 'Dockerfile'
             dir 'deploy'
-            args "-v ${env.WORKSPACE}:${ROBOKOP_HOME}/robokop-interfaces --entrypoint=''"
+            args "-v ${env.WORKSPACE}:${ROBOKOP_HOME}/robokop-interfaces --entrypoint='' --network=host"
         }
     }
     stages {
         stage ('setup env') {
             steps {
-                sh 'source deploy/setenv.sh'
+                sh '. deploy/setenv.sh'
             }
         } 
         stage ('run tests') {
