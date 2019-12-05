@@ -3,11 +3,8 @@ pipeline {
         dockerfile {
             filename 'Dockerfile'
             dir 'deploy'
-            args "-v ${env.WORKSPACE}:${ROBOKOP_HOME}/robokop-interfaces --entrypoint=''"
+            args "-v ${env.WORKSPACE}:/home/murphy/robokop-interfaces --entrypoint=''"
         }
-    }
-    triggers {
-        cron ('*/5 * * * *')
     }
     environment {
         TEST_NEO4J = 'test_neo4j_monitor.py'
