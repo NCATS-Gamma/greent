@@ -1,7 +1,7 @@
 import os
 import itertools
 import logging
-from greent.node_types import node_types
+from greent import node_types
 from greent.util import Resource
 from greent.util import LoggingUtil
 from collections import defaultdict

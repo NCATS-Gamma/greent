@@ -129,7 +129,7 @@ def test_gene_to_phenotype(biolink):
     for e, k in results:
         assert k.type == node_types.PHENOTYPIC_FEATURE
     pheno_ids = [pheno_node.id for edge, pheno_node in results]
-    assert 'EFO:00046111' in pheno_ids
+    assert 'EFO:0004611' in pheno_ids
 
 def test_phenotype_to_gene(biolink):
     phenotype = KNode('HP:0000723', type=node_types.PHENOTYPIC_FEATURE, name="Restrictive Behaviour")
