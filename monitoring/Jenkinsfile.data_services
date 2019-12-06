@@ -4,7 +4,7 @@ pipeline {
             filename 'Dockerfile'
             dir 'deploy'
             additionalBuildArgs '--network=host'
-            args "-v ${env.WORKSPACE}:${ROBOKOP_HOME}/robokop-interfaces --entrypoint='' --network=host"
+            args "-v ${env.WORKSPACE}:/home/murphy/robokop-interfaces --entrypoint='' --network=host"
         }
     }
     environment {
