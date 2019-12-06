@@ -73,4 +73,4 @@ def make_requests(spec, exclude_path):
 def test_endpoints(get_swagger_docs, excluded_path):
     errors = make_requests(get_swagger_docs, excluded_path)
     print(json.dumps(errors, indent=2))
-    assert len() == 0
+    assert len(errors) == 0
