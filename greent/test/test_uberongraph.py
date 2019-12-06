@@ -11,6 +11,13 @@ def uberon(rosetta):
     uberon = rosetta.core.uberongraph
     return uberon
 
+def test_chem(uberon):
+    chem = KNode('CHEBI:9948',type=node_types.CHEMICAL_SUBSTANCE, name="Verapamil")
+    cc = uberon.get_chemical_by_chemical(chem)
+    for edge,node in cc:
+        if node.id in ['CHEBI:9948','CHEBI:77733']:
+            print(edge.original_predicate, node)
+
 def test_label(uberon):
     mondo = 'MONDO:0001876'
     expected_label='renal artery atheroma'
@@ -27,16 +34,18 @@ def test_disease_to_go(uberon):
     #Make sure that for a variety of cell types we 1) get relationships going both directions and
     # that we map all predicates
     disease = KNode('MONDO:0009212',type=node_types.DISEASE, name="Congenital Factor X Deficiency")
-    r = uberon.get_process_or_activity_by_disease( disease )
+    rp = uberon.get_process_by_disease( disease )
+    ra = uberon.get_activity_by_disease( disease )
+    r = rp + ra
     for ri in r:
         assert ri[0].standard_predicate.identifier != 'GAMMA:0'
     assert len(r) > 50
 
 def test_disease_to_go_2(uberon):
-    #Make sure that for a variety of cell types we 1) get relationships going both directions and
-    # that we map all predicates
     disease = KNode('HP:0012387',type=node_types.PHENOTYPIC_FEATURE, name="Bronchitis")
-    r = uberon.get_process_or_activity_by_disease( disease )
+    rp = uberon.get_process_by_phenotype( disease )
+    ra = uberon.get_activity_by_phenotype( disease )
+    r = rp + ra
     for ri in r:
         assert ri[0].standard_predicate.identifier != 'GAMMA:0'
     assert len(r) > 50

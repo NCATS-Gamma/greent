@@ -84,7 +84,8 @@ def test_gene_get_disease(pharos):
     gnode = KNode('HGNC:13006',type=node_types.GENE)
     results = pharos.gene_get_disease(gnode)
     identifiers = [(r[1].id,r[1].name) for r in results]
-    assert len(identifiers)==9
+    #This used to be 9 but lowered when we excluded Expression data.
+    assert len(identifiers)==3
     assert ('DOID:305','Carcinoma') in identifiers
-    assert ('DOID:3857','medulloblastoma, large-cell') in identifiers
+    assert ('DOID:11383','Cryptorchidism') in identifiers
 

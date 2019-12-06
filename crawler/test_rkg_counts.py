@@ -40,7 +40,10 @@ def get_prev(sname):
     fname = f'{sname}.{most_recent}'
     with open(os.path.join(currdir,fname),'r') as jsonfile:
         prev_data = json.load(jsonfile)
-    return prev_data
+    rdata = defaultdict(int)
+    for k,v in prev_data.items():
+        rdata[k]=v
+    return rdata
 
 def write_data(sname,outdata):
     currdir = os.path.join(os.path.dirname(os.path.abspath(__file__)),'kgstats')
@@ -66,7 +69,9 @@ def test_node_labels(driver):
         key= ','.join(labellist)
         current_count = result['c']
         previous_count = prev_nodes[key]
-        assert(current_count >= previous_count)
+        if previous_count > current_count:
+            print(f'{key}  {previous_count}  {current_count}')
+        #assert(current_count >= previous_count)
         outdata[key] = current_count
         if current_count > previous_count:
             increased=True
@@ -84,7 +89,9 @@ def test_edge_labels(driver):
         key = result['l']
         current_count = result['c']
         previous_count = prev_nodes[key]
-        assert(current_count >= previous_count)
+        if previous_count > current_count:
+            print(f'{key}  {previous_count}  {current_count}')
+        #assert(current_count >= previous_count)
         outdata[key] = current_count
         if current_count > previous_count:
             increased=True
@@ -102,7 +109,9 @@ def test_edge_sources(driver):
         key = result['l']
         current_count = result['c']
         previous_count = prev_nodes[key]
-        assert(current_count >= previous_count)
+        if previous_count > current_count:
+            print(f'{key}  {previous_count}  {current_count}')
+        #assert(current_count >= previous_count)
         outdata[key] = current_count
         if current_count > previous_count:
             increased=True
@@ -127,7 +136,9 @@ def test_nn(driver):
         key = sourcekey+"+"+targetkey
         current_count = result['c']
         previous_count = prev_edges[key]
-        assert(current_count >= previous_count)
+        #assert(current_count >= previous_count)
+        if previous_count > current_count:
+            print(f'{key}  {previous_count}  {current_count}')
         outdata[key] = current_count
         if current_count > previous_count:
             increased=True

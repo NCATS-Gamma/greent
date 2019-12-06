@@ -25,10 +25,13 @@ class TypeCheck(Service):
         node_types.CELL: ['CL'],
         node_types.DISEASE: ['MONDO','DOID','ORPHANET'],
         node_types.PHENOTYPIC_FEATURE: ['HP'],
-        node_types.GENE_PRODUCT: ['UNIPROTKB','PR' ],
+        #So for the moment, PR is synonymizing with HGNC, so you'll get a gene product on every gene (bleah)
+        #taking out PR on product fixes that but the right thing to do is figure out how to handle genes/products
+        #node_types.GENE_PRODUCT: ['PR','GTOPDB' ],
+        node_types.GENE_PRODUCT: ['GTOPDB' ],
         node_types.GENE_FAMILY: [ 'HGNC.FAMILY', 'PANTHER.FAMILY'],
         node_types.GENE: ['HGNC'],
-        node_types.CHEMICAL_SUBSTANCE: ['CHEBI','CHEMBL', 'PUBCHEM','KEGG.COMPOUND','UNIPROTKB'],
+        node_types.CHEMICAL_SUBSTANCE: ['CHEBI','CHEMBL', 'PUBCHEM','KEGG.COMPOUND'],
         node_types.SEQUENCE_VARIANT: ['CAID','HGVS','ROBO_VARIANT','DBSNP'],
         node_types.PATHWAY: [] }
 

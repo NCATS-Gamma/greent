@@ -81,6 +81,7 @@ class PharosMySQL(Service):
             AND da.cmpd_chemblid IS NOT NULL
             AND x.xtype='HGNC' 
             AND x.value = '{hgnc}';"""
+            #print(query1)
             self.g2d(hgnc,query1,chembls,resolved_edge_nodes,gene_node)
             query2=\
             f"""SELECT DISTINCT da.cmpd_name_in_src as drug, da.cmpd_id_in_src as cid, catype AS id_src,
@@ -89,6 +90,7 @@ class PharosMySQL(Service):
             FROM xref x, cmpd_activity da  
             WHERE  x.protein_id = da.target_id AND x.xtype='HGNC' AND x.value = '{hgnc}';"""
             self.g2d(hgnc,query2,chembls,resolved_edge_nodes,gene_node)
+            #print(query1)
         return resolved_edge_nodes
 
     def d2g(self, drug_node, query, resolved_edge_nodes, chembl,hgncs):
@@ -119,6 +121,7 @@ class PharosMySQL(Service):
             AND da.cmpd_chemblid='{Text.un_curie(chembl)}' 
             AND x.xtype='HGNC' 
             AND da.target_id = p.id;"""
+            print(query)
             self.d2g(drug_node, query, resolved_edge_nodes, chembl,hgncs)
             query=f"""SELECT DISTINCT x.value, p.sym, 
             da.act_value AS affinity, da.act_type as affinity_parameter, da.act_type AS pred,
@@ -128,6 +131,7 @@ class PharosMySQL(Service):
             AND da.cmpd_id_in_src='{Text.un_curie(chembl)}' 
             AND x.xtype='HGNC' 
             AND da.target_id = p.id;"""
+            print(query)
             self.d2g(drug_node, query, resolved_edge_nodes, chembl,hgncs)
         return resolved_edge_nodes
 

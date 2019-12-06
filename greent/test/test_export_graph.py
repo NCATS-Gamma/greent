@@ -104,9 +104,11 @@ def test_subclass_nt_to_gene_product_1(rosetta,eg):
     assert eg.get_leaf_type(node,node_types.NAMED_THING)[0] == node_types.GENE_PRODUCT
 
 def test_subclass_nt_to_gene_product_2(rosetta,eg):
+    #This one is weird.  We're not too sure whether uniprotkb is a gene or a gene product
+    #ATM, we're ont he side of GENE
     node = KNode('UniProtKB:P31946', type=node_types.NAMED_THING)
     rosetta.synonymizer.synonymize(node)
-    assert eg.get_leaf_type(node,node_types.NAMED_THING)[0] == node_types.GENE_PRODUCT
+    assert eg.get_leaf_type(node,node_types.NAMED_THING)[0] == node_types.GENE
 
 def test_subclass_nt_to_biological_process(rosetta,eg):
     node = KNode('GO:0006915', type=node_types.NAMED_THING)

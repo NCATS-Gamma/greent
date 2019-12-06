@@ -65,6 +65,7 @@ class HMDB(Service):
 
     def request_statement(self,old_node,input_identifier,node_type,fname):
         url = f'{self.url}/statements?s={input_identifier}&categories={self.concepts_robo2hmdb[node_type]}'
+        print(url)
         raw_results = requests.get(url).json()
         results = []
         for triple in raw_results:
@@ -102,8 +103,9 @@ class HMDB(Service):
     def enzyme_to_metabolite(self,enzyme_node):
         return self.A_to_B(enzyme_node, 'UniProtKB', node_types.CHEMICAL_SUBSTANCE, 'enzyme_to_metabolite')
 
-    def pathway_to_metabolite(self,pathway_node):
-        return self.A_to_B(pathway_node, 'SMPDB', node_types.CHEMICAL_SUBSTANCE, 'enzyme_to_pathway')
+    #Pathways don't work with the beacon
+    #def pathway_to_metabolite(self,pathway_node):
+    #    return self.A_to_B(pathway_node, 'SMPDB', node_types.CHEMICAL_SUBSTANCE, 'enzyme_to_pathway')
 
     def metabolite_to_enzyme(self,metabolite_node):
         return self.A_to_B(metabolite_node, 'HMDB', node_types.GENE, 'metabolite_to_enzyme')
@@ -111,5 +113,6 @@ class HMDB(Service):
     def metabolite_to_disease(self,metabolite_node):
         return self.A_to_B(metabolite_node, 'HMDB', node_types.DISEASE, 'metabolite_to_disease')
 
-    def metabolite_to_pathway(self,metabolite_node):
-        return self.A_to_B(metabolite_node, 'HMDB', node_types.PATHWAY, 'metabolite_to_pathway')
+    #Pathways don't work with the beacon
+    #def metabolite_to_pathway(self,metabolite_node):
+    #    return self.A_to_B(metabolite_node, 'HMDB', node_types.PATHWAY, 'metabolite_to_pathway')

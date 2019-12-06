@@ -55,7 +55,6 @@ classes:
       - PHAROS.DRUG
       - DRUG.INTERACTION
       - CTD
-      - UNIPROTKB
       - METABOLON
       - FOOD
 
@@ -93,7 +92,6 @@ classes:
 
   gene product:
     id_prefixes:
-      - UNIPROTKB
       - GTOPDB
       - PR
 

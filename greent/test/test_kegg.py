@@ -153,14 +153,16 @@ def test_get_reaction_morphinetomorphine3gluc(kegg):
     assert 'enzyme' in reaction
 
 
-def test_chem_to_enzyme_fail(kegg,rosetta):
+#Test passes but is very slow
+def slow_test_chem_to_enzyme_fail(kegg,rosetta):
     input = KNode('CHEBI:29073',name='CHEDMICAL', type=node_types.METABOLITE)
     rosetta.synonymizer.synonymize(input)
     results = kegg.chemical_get_enzyme(input)
     print(results)
     assert True
 
-def test_chem_to_enzyme_failagain(kegg,rosetta):
+#Test passes but is very slow
+def slow_test_chem_to_enzyme_failagain(kegg,rosetta):
     input = KNode('CHEBI:16856',name='CHEDMICAL', type=node_types.METABOLITE)
     rosetta.synonymizer.synonymize(input)
     results = kegg.chemical_get_enzyme(input)

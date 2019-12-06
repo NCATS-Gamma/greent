@@ -63,7 +63,7 @@ def test_get_pathway_by_gene_family(panther):
     sub_family_node = KNode('PTHR11003:SF75',type= node_types.GENE_FAMILY, name='POTASSIUM CHANNEL SUBFAMILY K MEMBER 9' )
     response = panther. get_pathway_by_gene_family(top_family_node)
     node_ids = [ relation[1].id for relation in response ]
-    assert 'P04376' in node_ids
+    assert 'PANTHER.PATHWAY:P04376' in node_ids
     
 
 def test_get_gene_by_gene_family(panther):

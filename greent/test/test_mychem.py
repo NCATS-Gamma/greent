@@ -35,13 +35,13 @@ def test_glyburide(rosetta,mychem):
     found2 = False
     for e,n in results:
         print(e.original_predicate.label, n)
-#        if n.id == 'UMLS:C0007222':
-#            found1 = True
-#            assert e.original_predicate.label == 'contraindication'
-#        if n.id == 'UMLS:C0003873':
-#            found2 = True
-#            assert e.original_predicate.label == 'treats'
-#        assert e.provided_by == 'mychem.get_drugcentral'
+        if n.id == 'UMLS:C0009450': #communicable diseases
+            found1 = True
+            assert e.original_predicate.label == 'contraindication'
+        if n.id == 'UMLS:C0011860': #diabetes
+            found2 = True
+            assert e.original_predicate.label == 'treats'
+        assert e.provided_by == 'mychem.get_drugcentral'
     assert found1
     assert found2
 
@@ -91,5 +91,5 @@ def x_test_with_pheno_filter(rosetta):
 
 def test_drug_gene(mychem):
     node = KNode('DRUGBANK:DB00802', type=node_types.CHEMICAL_SUBSTANCE) # Alfentanyl
-    results = mychem.get_gene_from_drug(node)
+    results = mychem.get_gene_by_drug(node)
     assert len(results) > 0

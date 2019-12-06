@@ -22,14 +22,15 @@ def test_kegg_get_enzyme_norcodeine(rosetta):
         print(edge,node.id,node.name)
 
 
-def test_kegg(rosetta):
-    fname='caster.upcast(kegg~enzyme_get_chemicals,chemical_substance)'
-    func = rosetta.get_ops(fname)
-    assert func is not None
-    node = KNode('HGNC:2843', name='gene',type=node_types.GENE)
-    rosetta.synonymizer.synonymize(node)
-    results = func(node)
-    assert len(results) > 0
+#kegg.enzyme_get_chemicals is deprecated, so we no longer need this test
+#def test_kegg(rosetta):
+#    fname='caster.upcast(kegg~enzyme_get_chemicals,chemical_substance)'
+#    func = rosetta.get_ops(fname)
+#    assert func is not None
+#    node = KNode('HGNC:2843', name='gene',type=node_types.GENE)
+#    rosetta.synonymizer.synonymize(node)
+#    results = func(node)
+#    assert len(results) > 0
 
 
 def test_kegg_chem_to_chem_carnitine(rosetta):
@@ -78,7 +79,7 @@ def test_output_filter(rosetta):
     #These are genetic conditions associated with PPARG
     assert 'MONDO:0011448' in gc_identifiers
     assert 'MONDO:0018883' in gc_identifiers
-    assert 'MONDO:0019245' in gc_identifiers
+    assert 'MONDO:0019182' in gc_identifiers
     #These are diseases associated with PPARG that are not Genetic Conditions (non-comprehensive)
     assert 'MONDO:0001106' not in gc_identifiers
 
@@ -101,19 +102,19 @@ def test_null_input_filter(rosetta):
     fname='caster.input_filter(biolink~pathway_get_gene,pathway)'
     func = rosetta.get_ops(fname)
     assert func is not None
-    results = func(KNode('KEGG-path:maphsa04211', type=node_types.BIOLOGICAL_PROCESS)) #one of the results from the above
+    results = func(KNode('REACT:R-HSA-5635838', type=node_types.BIOLOGICAL_PROCESS)) #one of the results from the above
     assert len(results) > 0
     for edge,node in results:
         assert node.type == node_types.GENE
     gene_ids = [ node.id for edge,node in results]
-    assert 'HGNC:9236' in gene_ids #PPARG
+    assert 'HGNC:2865' in gene_ids
 
 def test_input_filter(rosetta):
-    """We have a typecheck for sell, so we can check for cell->something push_ups. IN this case the only
+    """We have a typecheck for cell, so we can check for cell->something push_ups. IN this case the only
     cell->something function we have is cell->anatomy, and anatomy is also the superclass, so it gets a little
     confusing.  But basically, this is where we are going to have an anatomy node containing a cell identifier,
     and we should be able to call the function.   But when we call it with a non-cell anatomy, nothing will happen"""
-    fname='caster.input_filter(uberongraph~get_anatomy_by_cell_graph,cell,typecheck~is_cell)'
+    fname='caster.input_filter(uberongraph~get_anatomy_by_anatomy_graph,cell,typecheck~is_cell)'
     func = rosetta.get_ops(fname)
     assert func is not None
     results = func(KNode('CL:0000169', type=node_types.ANATOMICAL_ENTITY)) #Type-B pancreatic cell cast as an anatomy
@@ -125,7 +126,7 @@ def test_input_filter(rosetta):
 
 def test_nested(rosetta):
     """cell->anatomy should be callable even if the input is upcast to an anatomy and we want a cell as output"""
-    fname = 'caster.output_filter(input_filter(uberongraph~get_anatomy_by_cell_graph,cell,typecheck~is_cell),cell,typecheck~is_cell)'
-    #Test that we can actually get a function.  This was failing 4/21
+    fname = 'caster.output_filter(input_filter(uberongraph~get_anatomy_by_anatomy_graph,cell,typecheck~is_cell),cell,typecheck~is_cell)'
+    #Test that we can actually get a function.
     func = rosetta.get_ops(fname)
 

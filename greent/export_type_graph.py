@@ -1,6 +1,7 @@
 import os
 import itertools
 import logging
+from greent.node_types import node_types
 from greent.util import Resource
 from greent.util import LoggingUtil
 from collections import defaultdict
@@ -49,6 +50,7 @@ class ExportGraph:
         return False
 
     def get_leaf_type(self,node,current_type):
+        print(node.id, current_type)
         try:
             child_types = self.subs[current_type]
         except KeyError:
@@ -57,10 +59,18 @@ class ExportGraph:
         for possible_child_type in child_types:
             if self.nodeistype(node,possible_child_type):
                 trues.append(possible_child_type)
+        print(' ',trues)
         list_of_ltypes = [self.get_leaf_type(node,t) for t in trues ]
         ltypes = list(set(list(itertools.chain.from_iterable(list_of_ltypes))))
+        #The biolink model has cell, and cellular component as direct subclasses of anatomy
+        #GO has cell as a subclass of cellular component
+        #CC can be a leaf (for something like nucleus) but not for a real cell.
+        #This may be a general problem, so we should scour ltypes to remove any member that is
+        # an ancestor of another member, but since this is the only current case, I will special case it
         if len(ltypes) == 0:
             return [current_type]
+        if node_types.CELL in ltypes and node_types.CELLULAR_COMPONENT in ltypes:
+            ltypes.remove(node_types.CELLULAR_COMPONENT)
         return ltypes
         #There are more than one possibility.  Not 100% sure what to do here
         #Option 1: Stop & return current
