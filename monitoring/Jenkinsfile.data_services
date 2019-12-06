@@ -7,6 +7,9 @@ pipeline {
             args "-v ${env.WORKSPACE}:/home/murphy/robokop-interfaces --entrypoint='' --network=host"
         }
     }
+    triggers {
+        cron ('*/5 * * * *')
+    }
     environment {
         TEST_NEO4J = 'test_neo4j_monitor.py'
         TEST_OMNICORP = 'test_omnicorp_monitoring.py'
