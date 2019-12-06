@@ -63,7 +63,7 @@ def make_requests(spec, exclude_path):
                     (
                         r['path'],
                         response.status_code,
-                        response.content,
+                        response.content.decode('utf-8'),
                         r['body']
                     )
                 )
@@ -72,5 +72,5 @@ def make_requests(spec, exclude_path):
 
 def test_endpoints(get_swagger_docs, excluded_path):
     errors = make_requests(get_swagger_docs, excluded_path)
-    print(json.dumps(errors, indent=2))
+    print(json.dumps(errors))
     assert len(errors) == 0
