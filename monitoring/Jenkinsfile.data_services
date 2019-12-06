@@ -1,0 +1,97 @@
+pipeline {
+    agent {
+        dockerfile {
+            filename 'Dockerfile'
+            dir 'deploy'
+            additionalBuildArgs '--network=host'
+            args "-v ${env.WORKSPACE}:/home/murphy/robokop-interfaces --entrypoint='' --network=host"
+        }
+    }
+    environment {
+        TEST_NEO4J = 'test_neo4j_monitor.py'
+        TEST_OMNICORP = 'test_omnicorp_monitoring.py'
+        TEST_REDIS = 'test_redis_monitor.py'
+        TEST_PUBMED_CACHE = 'test_pubmed_cache.py'
+        TEST_MESSENGER = 'test_messenger.py'
+        TEST_BUILDER = 'test_builder_api.py'
+        TEST_RANKER = 'test_ranker_api.py'
+        TEST_MANAGER = 'test_manager.py'
+
+        ROBOKOP_HOME="${params.ROBOKOP_HOME}"
+        OMNICORP_HOST="${params.OMNICORP_HOST}"
+        OMNICORP_PORT="${params.OMNICOPR_PORT}"
+        OMNICORP_DB="${params.OMNICORP_DB}"
+        OMNICORP_USER="${params.OMNICORP_USER}"
+        OMNICORP_PASSWORD="${params.OMNICORP_PASSWORD}"
+
+        NEO4J_HOST="${params.NEO4J_HOST}"
+        NEO4J_USER="${params.NEO4J_USER}"
+        NEO4J_HTTP_PORT="${params.NEO4J_HTTP_PORT}"
+        NEO4J_BOLT_PORT="${params.NEO4J_BOLT_PORT}"
+        NEO4J_HTTPS_PORT="${params.NEO4J_HTTPS_PORT}"
+        NEO4J_PASSWORD="${params.NEO4J_PASSWORD}"
+
+        PUBMED_CACHE_HOST="${params.PUBMED_CACHE_HOST}"
+        PUBMED_CACHE_PORT="${params.PUBMED_CACHE_PORT}"
+        PUBMED_CACHE_PASSWORD="${params.PUBMED_CACHE_PASSWORD}"
+
+        CACHE_HOST="${params.CACHE_HOST}"
+        CACHE_PORT="${params.CACHE_PORT}"
+        CACHE_PASSWORD="${params.CACHE_PASSWORD}"
+
+    }
+    stages {
+        stage ('Run Tests') {
+            parallel {
+                stage ('Monitoring Neo4j') {
+                    steps {
+                        sh "pytest monitoring/${TEST_NEO4J}"
+                    }
+                    post {
+                        failure {
+                            echo "failed on neo4j."
+                        }
+                    }
+                }
+                stage ('Monitoring main Redis') {
+                    steps {
+                        sh "pytest monitoring/${TEST_REDIS}"
+                    } 
+                    post {
+                        failure {
+                            echo "Failed on redis."
+                        }
+                    }
+                }
+                stage ('Monitoring Omnicorp') {
+                    steps {
+                        sh "pytest monitoring/${TEST_OMNICORP}"
+                    }
+                    post {
+                        failure {
+                            echo "Failed on omnicorp."
+                        }
+                    }
+                }
+                stage ('Monitoring Pubmed Cache') {
+                    steps {
+                        sh "pytest monitoring/${TEST_PUBMED_CACHE}"
+                    }
+                    post {
+                        failure {
+                            echo "Failed on Pubmed Cache."
+                        }
+                    }
+                }
+            }
+        }
+    }
+    post {
+        success {
+            echo "Everything seems good."
+        }
+        failure {
+            echo "Something was wrong!!"
+        }
+    }
+}
