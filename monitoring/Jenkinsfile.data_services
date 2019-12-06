@@ -22,18 +22,22 @@ pipeline {
         OMNICORP_PORT="${params.OMNICOPR_PORT}"
         OMNICORP_DB="${params.OMNICORP_DB}"
         OMNICORP_USER="${params.OMNICORP_USER}"
+        OMNICORP_PASSWORD="${params.OMNICORP_PASSWORD}"
 
         NEO4J_HOST="${params.NEO4J_HOST}"
         NEO4J_USER="${params.NEO4J_USER}"
         NEO4J_HTTP_PORT="${params.NEO4J_HTTP_PORT}"
         NEO4J_BOLT_PORT="${params.NEO4J_BOLT_PORT}"
         NEO4J_HTTPS_PORT="${params.NEO4J_HTTPS_PORT}"
+        NEO4J_PASSWORD="${params.NEO4J_PASSWORD}"
 
         PUBMED_CACHE_HOST="${params.PUBMED_CACHE_HOST}"
         PUBMED_CACHE_PORT="${params.PUBMED_CACHE_PORT}"
+        PUBMED_CACHE_PASSWORD="${params.PUBMED_CACHE_PASSWORD}
 
         CACHE_HOST="${params.CACHE_HOST}"
         CACHE_PORT="${params.CACHE_PORT}"
+        CACHE_PASSWORD="${params.CACHE_PASSWORD}"
 
     }
     stages {
