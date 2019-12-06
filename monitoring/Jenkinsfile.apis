@@ -49,7 +49,7 @@ pipeline {
             parallel {
                 stage ('Monitoring Ranker') {
                     steps {
-                        sh "pytest monitoring/${TEST_RANKER}"
+                        sh "pytest monitoring/${TEST_RANKER} -s"
                     }
                     post {
                         failure {
@@ -59,7 +59,7 @@ pipeline {
                 }
                 stage ('Monitoring Builder') {
                     steps {
-                        sh "pytest monitoring/${TEST_BUILDER}"
+                        sh "pytest monitoring/${TEST_BUILDER} -s"
                     } 
                     post {
                         failure {
@@ -69,7 +69,7 @@ pipeline {
                 }
                 stage ('Monitoring Messenger') {
                     steps {
-                        sh "pytest monitoring/${TEST_MESSENGER}"
+                        sh "pytest monitoring/${TEST_MESSENGER} -s"
                     }
                     post {
                         failure {
@@ -77,9 +77,9 @@ pipeline {
                         }
                     }
                 }
-                stage ('Monitoring Pubmed Manager') {
+                stage ('Monitoring Manager') {
                     steps {
-                        sh "pytest monitoring/${TEST_MANAGER}"
+                        sh "pytest monitoring/${TEST_MANAGER} -s"
                     }
                     post {
                         failure {
