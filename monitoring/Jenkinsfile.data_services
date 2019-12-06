@@ -19,7 +19,7 @@ pipeline {
 
         ROBOKOP_HOME="${params.ROBOKOP_HOME}"
         OMNICORP_HOST="${params.OMNICORP_HOST}"
-        OMNICORP_PORT="${params.OMNICOPR_PORT}"
+        OMNICORP_PORT="${params.OMNICORP_PORT}"
         OMNICORP_DB="${params.OMNICORP_DB}"
         OMNICORP_USER="${params.OMNICORP_USER}"
         OMNICORP_PASSWORD="${params.OMNICORP_PASSWORD}"
