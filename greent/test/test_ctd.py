@@ -41,36 +41,14 @@ def test_expanded_drug_to_gene_glucose(ctd,rosetta):
         print( edge.original_predicate, edge.standard_predicate, node.name )
         assert edge.standard_predicate.identifier != 'GAMMA:0'
 
-def test_expanded_gene_to_drug_what(ctd,rosetta):
+def test_expanded_gene_to_drug_fails(ctd,rosetta):
+    """This gene has nominal results, but we want to ignore them because the
+    publication support is insufficient."""
     input_node = KNode("HGNC:1305", type=node_types.GENE, name="C6ORF21")
     rosetta.synonymizer.synonymize(input_node)
     results = ctd.gene_to_drug_expanded(input_node)
-    assert len(results) > 0
-    for edge,node in results:
-        assert node.type == node_types.CHEMICAL_SUBSTANCE
-        assert edge.standard_predicate.identifier != 'GAMMA:0'
-        print(edge, edge.standard_predicate)
+    assert len(results) == 0
 
-def test_expanded_gene_to_drug(ctd,rosetta):
-    input_node = KNode("HGNC:4558", type=node_types.GENE, name="GPX6")
-    rosetta.synonymizer.synonymize(input_node)
-    results = ctd.gene_to_drug_expanded(input_node)
-    assert len(results) > 0
-    for edge,node in results:
-        assert node.type == node_types.CHEMICAL_SUBSTANCE
-        assert edge.standard_predicate.identifier != 'GAMMA:0'
-        print(edge, edge.standard_predicate)
-
-def test_disease_to_chemical_fails(rosetta,ctd):
-    input_node = KNode("MONDO:0009184", type=node_types.DISEASE, name='something')
-    rosetta.synonymizer.synonymize(input_node)
-    print(input_node.synonyms)
-    results = ctd.disease_to_chemical(input_node)
-    #Now, we're not returning the inferred ones.
-    assert len(results) > 100
-    for edge, node in results:
-        assert node.type == node_types.CHEMICAL_SUBSTANCE
-        assert edge.standard_predicate.identifier != 'GAMMA:0'
 
 def test_disease_to_chemical(rosetta,ctd):
     input_node = KNode("MONDO:0004979", type=node_types.DISEASE, name='Asthma')
@@ -85,14 +63,14 @@ def test_disease_to_chemical(rosetta,ctd):
 
 def test_gene_to_drug_and_back(ctd):
     input_node = KNode('MESH:D003976', type=node_types.GENE, name='Diazinon')
-    results = ctd.drug_to_gene(input_node)
+    results = ctd.drug_to_gene_expanded(input_node)
     results = list(filter(lambda en: en[1].id == 'NCBIGENE:5243', results))
     for edge, node in results:
         assert node.type == node_types.GENE
         assert edge.standard_predicate.identifier != 'GAMMA:0'
     dgedges = set([e.original_predicate.label for e, n in results])
     input_node_2 = KNode('NCBIGENE:5243', type=node_types.GENE, name='ABCB1')
-    results = ctd.gene_to_drug(input_node_2)
+    results = ctd.gene_to_drug_expanded(input_node_2)
     for edge, node in results:
         assert node.type == node_types.CHEMICAL_SUBSTANCE
         assert edge.standard_predicate.identifier != 'GAMMA:0'
@@ -130,7 +108,7 @@ def test_drugname_to_mesh_synonym(ctd):
 
 def test_drug_to_gene_simple(ctd):
     input_node = KNode("MESH:D000068579", type=node_types.CHEMICAL_SUBSTANCE)
-    results = ctd.drug_to_gene(input_node)
+    results = ctd.drug_to_gene_expanded(input_node)
     for edge, node in results:
         assert node.type == node_types.GENE
         assert edge.standard_predicate.identifier != 'GAMMA:0'
@@ -140,9 +118,10 @@ def test_drug_to_gene_simple(ctd):
 def test_drug_to_gene_Huge(ctd):
     # Even though the main identifier is drugbank, CTD should find the right synonym in there somewhere.
     input_node = KNode("MESH:D014635", name="Valproic Acid", type=node_types.CHEMICAL_SUBSTANCE)
-    results = ctd.drug_to_gene(input_node)
+    results = ctd.drug_to_gene_expanded(input_node)
     #OK, this looks like a lot, but it's better than the 30000 we had before filtering.
-    assert len(results) < 4000
+    assert len(results) < 7000
+    assert len(results) > 6000
     #print(results[0][0].original_predicate )
     #print(results[0][0].standard_predicate )
     #print(len(results))
@@ -152,7 +131,7 @@ def test_drug_to_gene_synonym(ctd):
     # Even though the main identifier is drugbank, CTD should find the right synonym in there somewhere.
     input_node = KNode("DB:FakeID", type=node_types.CHEMICAL_SUBSTANCE)
     input_node.add_synonyms(set([LabeledID(identifier="MESH:D000068579", label="blah")]))
-    results = ctd.drug_to_gene(input_node)
+    results = ctd.drug_to_gene_expanded(input_node)
     for edge, node in results:
         assert node.type == node_types.GENE
         assert edge.standard_predicate.identifier != 'GAMMA:0'
@@ -162,7 +141,7 @@ def test_drug_to_gene_synonym(ctd):
 
 def test_gene_to_drug_unique(ctd):
     input_node = KNode("NCBIGENE:345", type=node_types.GENE)  # APOC3
-    results = ctd.gene_to_drug(input_node)
+    results = ctd.gene_to_drug_expanded(input_node)
     #We would rather have this, but right now it's loosing too much information
     #outputs = [(e.standard_predicate, n.id) for e, n in results]
     outputs = [(e.original_predicate, n.id) for e, n in results]
@@ -177,7 +156,7 @@ def test_gene_to_drug_unique(ctd):
 def test_gene_to_drug_CASP3(ctd,rosetta):
     input_node = KNode("HGNC:1504", type=node_types.GENE)  # CASP3
     rosetta.synonymizer.synonymize(input_node)
-    results = ctd.gene_to_drug(input_node)
+    results = ctd.gene_to_drug_expanded(input_node)
     #See note in test_gene_to_drug_unique
     outputs = [(e.original_predicate, n.id) for e, n in results]
     total = len(outputs)
@@ -190,7 +169,7 @@ def test_gene_to_drug_CASP3(ctd,rosetta):
 
 def test_gene_to_drug_ACHE(ctd):
     input_node = KNode("NCBIGENE:43", type=node_types.GENE)  # ACHE
-    results = ctd.gene_to_drug(input_node)
+    results = ctd.gene_to_drug_expanded(input_node)
     #See note in test_gene_to_drug_unique
     outputs = [(e.original_predicate, n.id) for e, n in results]
     total = len(outputs)
@@ -206,7 +185,7 @@ def test_gene_to_drug_synonym(ctd):
     # Even though the main identifier is drugbank, CTD should find the right synonym in there somewhere.
     input_node = KNode("DB:FakeID", type=node_types.GENE)
     input_node.add_synonyms(set(["NCBIGene:5743"]))
-    results = ctd.gene_to_drug(input_node)
+    results = ctd.gene_to_drug_expanded(input_node)
     for e, node in results:
         assert e.standard_predicate.identifier != 'GAMMA:0'
         assert node.type == node_types.CHEMICAL_SUBSTANCE
@@ -216,7 +195,7 @@ def test_gene_to_drug_synonym(ctd):
 def test_gene_to_drug_BCL2(ctd,rosetta):
     input_node = KNode("HGNC:990", type=node_types.GENE, name="BCL2")
     rosetta.synonymizer.synonymize(input_node)
-    results = ctd.gene_to_drug(input_node)
+    results = ctd.gene_to_drug_expanded(input_node)
     assert len(results) > 0
     for edge,node in results:
         assert node.type == node_types.CHEMICAL_SUBSTANCE
@@ -226,7 +205,7 @@ def test_gene_to_drug_BCL2(ctd,rosetta):
 
 def test_chemical_to_gene_glutathione(ctd):
     input_node = KNode("MESH:D006861", type=node_types.CHEMICAL_SUBSTANCE)
-    results = ctd.drug_to_gene(input_node)
+    results = ctd.drug_to_gene_expanded(input_node)
     for edge, node in results:
         assert edge.standard_predicate.identifier != 'GAMMA:0'
         assert node.type == node_types.GENE

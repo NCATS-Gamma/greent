@@ -203,6 +203,7 @@ class Biolink(Service):
         response = self.page_calls(url)
         return self.process_associations(response, 'pathway_get_genes', node_types.GENE, url, pathway.id, pathway, reverse=True)
 
+    #Not very useful now that the phenotype/disease links are gone from monarch
     def sequence_variant_get_phenotype(self, variant_node):
         results = []
         clinvarsyns = variant_node.get_synonyms_by_prefix('CLINVARVARIANT')
@@ -212,7 +213,17 @@ class Biolink(Service):
             response = self.page_calls(url)
             results.extend(self.process_associations(response, 'sequence_variant_get_phenotype', node_types.DISEASE_OR_PHENOTYPIC_FEATURE, clinvarsyn, url, variant_node))
         return results
-        
+
+    def sequence_variant_get_disease(self, variant_node):
+        results = []
+        clinvarsyns = variant_node.get_synonyms_by_prefix('CLINVARVARIANT')
+        for clinvarsyn in clinvarsyns:
+            clinvar_url_curie = f'ClinVarVariant:{Text.un_curie(clinvarsyn)}'
+            url = f'{self.url}/bioentity/variant/{clinvar_url_curie}/diseases/'
+            response = self.page_calls(url)
+            results.extend(self.process_associations(response, 'sequence_variant_get_disease', node_types.DISEASE, clinvarsyn, url, variant_node))
+        return results
+
     def disease_get_gene(self, disease):
         url = "{0}/bioentity/disease/{1}/genes/".format(self.url, disease.id)
         response = self.page_calls(url)

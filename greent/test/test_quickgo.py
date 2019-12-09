@@ -41,18 +41,8 @@ def xtest_extensions_long(quickgo):
     #    assert len(myedges) == 1
     #    assert myedges[0][0].standard_predicate is not None
 
-def test_reverse_extensions(quickgo):
-    r = quickgo.cell_to_go_term_annotation_extensions(KNode("CL:0002131", type=node_types.CELL))
-    types = set([n.type for e,n in r])
-    assert len(types) == 1
-    assert node_types.BIOLOGICAL_PROCESS_OR_ACTIVITY in types
-    myedges = list(filter( lambda en: en[1].id=='GO:0017080' , r))
-    assert len(myedges) == 1
-    assert myedges[0][0].standard_predicate is not None
-    assert myedges[0][1].name=='sodium channel regulator activity'
-
-
-def test_reverse_extensions(quickgo):
+#We no longer rely on this quickgo function.
+def _test_reverse_extensions(quickgo):
     r = quickgo.cell_to_go_term_annotation_extensions(KNode("CL:0002189", type=node_types.CELL))
     assert len(r) > 0
     types = set([n.type for e,n in r])

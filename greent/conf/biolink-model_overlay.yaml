@@ -812,6 +812,7 @@ slots:
       - RO:0002304 # causally upstream of, positive  effect
       - RO:0002305 # causally upstream of, negative  effect
       - RO:0002418 # causally upstream of or within
+      - RO:0003302 #Causes or contributes to
 
   related to:
     mappings:
@@ -1007,7 +1008,6 @@ slots:
     description: >-
       holds between a drug and a disease or phenotype that can be caused by the drug
     mappings:
-     - RO:0003302 #Causes or contributes to
      - Aeolus:0000001
 
   contraindicated for:

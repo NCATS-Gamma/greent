@@ -146,13 +146,12 @@ def test_biolink(rosetta, biolink):
     variant_node = KNode('HGVS:NC_000023.9:g.32317682G>A', type=node_types.SEQUENCE_VARIANT)
     rosetta.synonymizer.synonymize(variant_node)
     assert 'CLINVARVARIANT:94623' in variant_node.get_synonyms_by_prefix('CLINVARVARIANT')
-    relations = biolink.sequence_variant_get_phenotype(variant_node)
+    relations = biolink.sequence_variant_get_disease(variant_node)
     identifiers = [node.id for r,node in relations]
-    assert 'HP:0000750' in identifiers
-    assert 'HP:0003236' in identifiers
-    predicates = [ relation.standard_predicate for relation,n in relations ] 
+    assert 'MONDO:0010679' in identifiers
+    predicates = [ relation.standard_predicate for relation,n in relations ]
     plabels = set( [p.label for p in predicates] )
-    assert 'has_phenotype' in plabels
+    assert 'gene_associated_with_condition' in plabels
 
 def a_test_gwascatalog_variant_to_phenotype(gwascatalog, rosetta):
     # turned this off for now because it relies on gwascatalog being precached for CAIDs

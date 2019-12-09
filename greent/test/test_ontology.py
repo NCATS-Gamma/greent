@@ -19,14 +19,17 @@ def ontology():
 
 def test_label(ontology):
     assert ontology.label('MONDO:0005737') == "Ebola hemorrhagic fever"
+
 def test_is_a(ontology):
     assert ontology.is_a('MONDO:0005737', 'MONDO:0005762')
+
 def test_xrefs(ontology):
     xrefs = ontology.xrefs('MONDO:0005737')
     xref_ids = [ x['id'] for x in xrefs ]
     print (xref_ids)
     for i in [ "DOID:4325", "EFO:0007243", "ICD10:A98.4", "MedDRA:10014071", "MESH:D019142", "NCIT:C36171", "Orphanet:319218", "SCTID:37109004", "UMLS:C0282687" ]:
         assert i in xref_ids
+
 def test_synonyms(ontology):
     syns = ontology.synonyms ('MONDO:0005737')
     received = []
@@ -34,9 +37,9 @@ def test_synonyms(ontology):
         received = received + s.xref
     for expected in [ "DOID:4325",
                       "Orphanet:319218",
-                      "SCTID:186746000",
                       "NCIT:C36171" ]:
         assert expected in received
+
 def test_search(ontology):
     result = ontology.search ('ebola', ignore_case=True)
     assert result[0]['id'] == 'MONDO:0005737'
