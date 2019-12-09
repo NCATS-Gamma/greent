@@ -139,12 +139,19 @@ class GTExUtils:
     # param tar_file_name: str - the name of the GTEx data file name (tar)
     # returns ret_val: object - Exception on error, otherwise None
     #############
-    def process_gtex_files(self, working_data_directory: str, out_file_name: str, tar_file_name: str = 'GTEx_Analysis_v8_sQTL.tar') -> object:
+    def process_gtex_files(self, working_data_directory: str, out_file_name: str, tar_file_name: str = None, gtex_version: int = 8, is_sqtl: bool = False)-> object:
         # init the return
         ret_val = None
 
         # init the input file path
         full_tar_path = ''
+
+        # set a default tar file name if one isn't provided
+        if not tar_file_name:
+            if is_sqtl:
+                tar_file_name = f'GTEx_Analysis_v{gtex_version}_sQTL.tar'
+            else:
+                tar_file_name = f'GTEx_Analysis_v{gtex_version}_eQTL.tar'
 
         try:
             # define full paths to the input and output files
@@ -152,7 +159,7 @@ class GTExUtils:
             full_out_path = f'{working_data_directory}{out_file_name}'
 
             # define the url for the raw data file
-            url = f'https://storage.googleapis.com/gtex_analysis_v8/single_tissue_qtl_data/{tar_file_name}'
+            url = f'https://storage.googleapis.com/gtex_analysis_v{gtex_version}/single_tissue_qtl_data/{tar_file_name}'
 
             logger.info(f'Downloading raw GTEx data file {url}.')
 
@@ -187,8 +194,10 @@ class GTExUtils:
                         # get a handle to the tissue file
                         tissue_handle = tar_files.extractfile(tissue_file)
 
-                        # is this a "significant variant" data file. expecting format: 'GTEx_Analysis_v8_sQTL/<tissue_name>.v8.sqtl_signifpairs.txt.gz'
-                        if tissue_file.name.find('sqtl_signifpairs') > 0:
+                        # is this a "significant variant" data file. expecting formats:
+                        # eqtl - 'GTEx_Analysis_v8_eQTL/<tissue_name>.v8.signif_variant_gene_pairs.txt.gz'
+                        # sqtl - 'GTEx_Analysis_v8_sQTL/<tissue_name>.v8.sqtl_signifpairs.txt.gz'
+                        if tissue_file.name.find('signif') > 0:
                             logger.debug(f'Processing tissue file {tissue_file.name}.')
 
                             # get the tissue name from the name of the file
@@ -204,7 +213,7 @@ class GTExUtils:
 
                                 # open up the compressed file
                                 with gzip.open(tissue_handle, 'rt') as compressed_file:
-                                    # get the file line of the file
+                                    # get the headers line of the file
                                     first_line = next(compressed_file)
 
                                     # if this if the first file write out the csv file header
@@ -214,7 +223,11 @@ class GTExUtils:
 
                                     # for each line in the file
                                     for line in compressed_file:
-                                        output_file.write(self.parse_tissue_line(line, tissue_name, tissue_uberon, 0, 1))
+                                        if is_sqtl:
+                                            output_file.write(self.parse_tissue_line(line, tissue_name, tissue_uberon, 0, 1, is_sqtl=True))
+                                        else:
+                                            output_file.write(self.parse_tissue_line(line, tissue_name, tissue_uberon, 0, 1, is_sqtl=False))
+
                             else:
                                 logger.debug(f'Skipping unexpected tissue file {tissue_file.name}.')
                         else:
@@ -242,7 +255,7 @@ class GTExUtils:
     # param tissue_uberon - the tissue uberon id
     # returns the output line to add to the output file
     #############
-    def parse_tissue_line(self, line: str, tissue_name: str, tissue_uberon: str, variant_id_index: int, phenotype_id_index: int) -> str:
+    def parse_tissue_line(self, line: str, tissue_name: str, tissue_uberon: str, variant_id_index: int, gene_id_index: int, is_sqtl: bool = False) -> str:
         # init a line counter for error checking
         line_count: int = 1
 
@@ -261,14 +274,20 @@ class GTExUtils:
         else:
             # get the variant ID value
             variant_id: str = line_split[variant_id_index]
-            phenotype_id: str = line_split[phenotype_id_index]
 
             # get the HGVS value
             hgvs: str = self.get_hgvs_value(variant_id[3:])
 
-            # the phenotype id contains the ensembl id for the gene.
-            # it has the format: chr1:497299:498399:clu_51878:ENSG00000237094.11
-            gene_id: str = phenotype_id.split(':')[4].split('.')[0]
+            if is_sqtl:
+                # for sqtl the phenotype id contains the ensembl id for the gene.
+                # it has the format: chr1:497299:498399:clu_51878:ENSG00000237094.11
+                phenotype_id: str = line_split[gene_id_index]
+                gene: str = phenotype_id.split(':')[4]
+                # remove the version number
+                gene_id: str = gene.split('.')[0]
+            else:
+                # for eqtl this should just be the ensembl gene id, remove the version number
+                gene_id: str = line_split[gene_id_index].split('.')[0]
 
             # prepend the input line with the tissue name and uberon id
             new_line = f'{tissue_name},{tissue_uberon},{hgvs},{gene_id},{line}'

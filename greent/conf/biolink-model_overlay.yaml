@@ -572,6 +572,10 @@ slots:
       - CTD:decreases^RNA splicing
       - CTD:decreases^splicing
 
+  modifies splicing of:
+    mappings:
+      - GTEx:modifies_splicing_of
+
   affects stability of:
     mappings:
       - CTD:affects_stability_of
