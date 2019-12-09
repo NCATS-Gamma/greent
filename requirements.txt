@@ -21,3 +21,4 @@ mysql-connector
 aiosparql
 aiohttp
 pytabix
+pytest

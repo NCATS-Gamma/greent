@@ -189,6 +189,7 @@ def load_chemicals(rosetta, refresh=True):
     label_chebis(concord)
     label_chembls(concord, refresh= refresh)
     label_meshes(concord)
+    label_pubchem(concord, refresh= refresh)
     print('dumping')
     #Dump
     with open('chemconc.txt','w') as outf:
@@ -291,6 +292,23 @@ def label_meshes(concord):
     with open(labelname, 'rb') as inf:
         mesh_labels = pickle.load(inf)
     label_compounds(concord, 'MESH', partial(get_mesh_label, labels=mesh_labels))
+
+def label_pubchem(concord, refresh = False):
+    f_name =  'CID-IUPAC.gz'
+    if refresh:        
+        data = pull_via_ftp('ftp://ftp.ncbi.nlm.nih.gov','/pubchem/Compound/Extras/', f_name)
+        with open(f_name, 'wb') as outf:
+            outf.write(data)
+    labels = {}
+    with GzipFile(f_name, 'r') as in_file:
+        for line in in_file:
+            # since the synonyms are weighted already will just pick the first one.
+            l = line.decode().strip()
+            cid, label = l.split('\t')
+            if f'PUBCHEM:{cid}' in labels:
+                continue
+            labels[f'PUBCHEM:{cid}'] = label
+    label_compounds(concord, 'PUBCHEM', partial(get_dict_label, labels= labels))
 
 
 ###

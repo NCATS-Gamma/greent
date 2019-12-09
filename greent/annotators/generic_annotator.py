@@ -11,7 +11,7 @@ import asyncio
 from greent.util import Text, LoggingUtil
 import logging
 import traceback
-
+from greent import node_types
 
 logger = LoggingUtil.init_logging(__name__, level=logging.DEBUG, format='medium')
 
@@ -37,7 +37,11 @@ class GenericAnnotator(Annotator):
             self.onto_url = rosetta.core.onto.url
             self.concepts = rosetta.type_graph.concept_model
 
-        def annotate(self, node):     
+        def annotate(self, node):
+            ## sequence variants are unique for now
+            if node.type == node_types.SEQUENCE_VARIANT:
+                return
+
             ## override this and and other steps here aswell. For now we just grab literary synonyms
             self.get_literary_synonyms(node)
             self.get_good_name(node)

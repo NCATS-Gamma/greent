@@ -9,8 +9,10 @@ with driver.session() as session:
     # edge id index
     result = session.run("MATCH ()-[x]-() RETURN DISTINCT type(x) as predicate")
     predicates = list(row['predicate'] for row in result)
-    predicates.remove('is_a')
-    predicates.remove('Unmapped_Relation')
+    if 'is_a' in predicates:
+        predicates.remove('is_a')
+    if 'Unmapped_Relation' in predicates:
+        predicates.remove('Unmapped_Relation')
     session.run(f"""CALL db.index.fulltext.createRelationshipIndex('edge_id_index', [{', '.join(f"'{predicate}'" for predicate in predicates)}], ['id'], {{analyzer: 'keyword'}})""")
 
     # node name index
