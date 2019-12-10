@@ -12,7 +12,8 @@ class Onto(Service):
         self.name = name
         super(Onto, self).__init__(self.name, context)
     def get_ids(self):
-        obj = self.get(f"{self.url}/id_list/{self.name.upper()}")
+        u=f"{self.url}/id_list/{self.name.upper()}"
+        obj = self.get(u)
         return obj
     def is_a(self,identifier,candidate_ancestor):
         obj = self.get(f"{self.url}/is_a/{identifier}/{candidate_ancestor}")

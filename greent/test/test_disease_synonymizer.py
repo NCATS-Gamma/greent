@@ -6,6 +6,8 @@ from greent.util import Text
 
 
 def test_mondo_synonymization(rosetta):
+    """Start at the MONDO node for Niemann Pick Disease, look for other identifiers, including 
+    DOID and MeSH"""
     #Niemann Pick Disease (not type C)
     node = KNode('MONDO:0001982', type=node_types.DISEASE)
     synonyms = synonymize(node,rosetta.core)
@@ -22,6 +24,7 @@ def test_mondo_synonymization(rosetta):
     #assert node.name == 'Niemann-Pick Disease'
 
 def test_mondo_synonymization_2(rosetta):
+    """Given the MONDO for Ebola, make sure that we get back a DOID and a MESH"""
     node = KNode('MONDO:0005737', type=node_types.DISEASE)
     synonyms = synonymize(node,rosetta.core)
     assert len(synonyms) > 1
@@ -32,12 +35,11 @@ def test_mondo_synonymization_2(rosetta):
     assert len(meshes) > 0
     assert Text.get_curie(node.id) == 'MONDO'
 
-#This test doesn't currently pass because OXO hasn't integrated MONDO yet
-def future_test_disease_normalization(rosetta):
+def test_disease_normalization(rosetta):
+    """Given the DOID for Ebola, make sure that we get back a DOID and a MESH.
+    Calling through rosetta also normalizes, unlike the tests above"""
     node = KNode('DOID:4325', type=node_types.DISEASE)
-    synonyms = synonymize(node,rosetta.core)
-    print( synonyms )
-    node.add_synonyms(synonyms)
+    rosetta.synonymizer.synonymize(node)
     mondos = node.get_synonyms_by_prefix('MONDO')
     assert len(mondos) > 0
     assert Text.get_curie(node.id) == 'MONDO'

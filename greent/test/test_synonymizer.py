@@ -11,23 +11,20 @@ def test_GO(rosetta):
     s = rosetta.synonymizer.synonymize( node )
     assert True
 
-def test_HGNC(rosetta):
-    node = KNode('HGNC:795',name="ATM",type = node_types.GENE)
-    s = rosetta.synonymizer.synonymize( node )
-    print(node.synonyms)
-    assert True
-
 def test_RP(rosetta):
+    """Check that synonymization keeps the original identifier for a MONDO"""
     node = KNode('MONDO:0019200', name= 'retinitis pigmentosa', type=node_types.DISEASE)
     rosetta.synonymizer.synonymize(node)
     assert node.id == 'MONDO:0019200'
 
 def test_drug_with_mesh(rosetta):
+    """Check that synonymization works with Mesh Chemicals"""
     node = KNode('MESH:D000393',name="notsure",type = node_types.CHEMICAL_SUBSTANCE)
     s = rosetta.synonymizer.synonymize(node)
-    assert True
+    assert len(s) > 1
 
 def test_which_one(rosetta):
+    """Synonyms are calculated by type.  Check that we call the right synonymizer for each type"""
     print( rosetta.synonymizer.synonymizers[node_types.BIOLOGICAL_PROCESS_OR_ACTIVITY])
     synonymizer = rosetta.synonymizer
     synonymizer_map = synonymizer.synonymizers

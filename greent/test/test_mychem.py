@@ -12,6 +12,7 @@ def mychem(rosetta):
     return mychem
 
 def test_drugcentral(mychem):
+    """Check that Celecoxib treates Rheumatoid Arthritis (3873) and is contraindicated for Cardiovascular Disease (7222)"""
     node = KNode('CHEMBL:CHEMBL118', type=node_types.CHEMICAL_SUBSTANCE, name='Celecoxib') #Celecoxib
     results = mychem.get_drugcentral(node)
     found1 = False
@@ -28,6 +29,7 @@ def test_drugcentral(mychem):
     assert found2
 
 def test_glyburide(rosetta,mychem):
+    """Test that glyburide treats diabetes, but is contraindicated for communicable diseases"""
     node = KNode('CHEBI:5441', type=node_types.CHEMICAL_SUBSTANCE, name='glyburide')
     rosetta.synonymizer.synonymize(node)
     results = mychem.get_drugcentral(node)
@@ -46,35 +48,25 @@ def test_glyburide(rosetta,mychem):
     assert found2
 
 def test_glyburide_aeolus(rosetta,mychem):
+    """check adverse events of glyburide include weight increase, nausea, vomiting"""
     node = KNode('CHEBI:5441', type=node_types.CHEMICAL_SUBSTANCE, name='glyburide')
     rosetta.synonymizer.synonymize(node)
     results = mychem.get_adverse_events(node)
-    indications=['diabetes mellitus', ]
-    for e,n in results:
-        print(e.original_predicate.label, n.name)
+    r = [(e.original_predicate.label, n.name) for e,n in results]
+    assert ('causes_or_contributes_to', 'Weight increased') in r
+    assert ('causes_or_contributes_to', 'Nausea') in r
+    assert ('causes_or_contributes_to', 'Vomiting') in r
 
 def test_drug_adverse_events(mychem):
+    """Smoke check for adverse events; Calling with escitalopram produces results"""
     node = KNode('CHEMBL:CHEMBL1508', type=node_types.CHEMICAL_SUBSTANCE) #Escitalopram
     results = mychem.get_adverse_events(node)
-    #for e,n in results:
-    #    print(n)
     assert len(results) > 0
 
 def test_atorvastatin(mychem):
-    node = KNode('CHEMBL:CHEMBL1487', type=node_types.CHEMICAL_SUBSTANCE) #Escitalopram
+    """Smoke check for adverse events; Calling with atorvastatin produces results"""
+    node = KNode('CHEMBL:CHEMBL1487', type=node_types.CHEMICAL_SUBSTANCE) #Atorvastatin
     results = mychem.get_adverse_events(node)
-    assert len(results) > 0
-
-def x_test_event_to_drug(mychem):
-    node = KNode('MONDO:0002050', type=node_types.DISEASE, name='Mental Depression')
-    node.add_synonyms( set( [LabeledID(identifier='MedDRA:10002855', label='Depression')]))
-    results = mychem.get_drug_from_adverse_events(node)
-    assert len(results) > 0
-
-def x_test_event_to_drug(mychem):
-    node = KNode('HP:0002018', type=node_types.PHENOTYPIC_FEATURE, name='Nausea')
-    node.add_synonyms( set( [LabeledID(identifier='MedDRA:10028813', label='Nausea')]))
-    results = mychem.get_drug_from_adverse_events(node)
     assert len(results) > 0
 
 
@@ -88,8 +80,9 @@ def x_test_with_pheno_filter(rosetta):
     results = func(KNode('CHEMBL:CHEMBL1508', type=node_types.CHEMICAL_SUBSTANCE))
     assert len(results) > 0
 
-
 def test_drug_gene(mychem):
+    """Check Alfentanyl -> ORPM1"""
     node = KNode('DRUGBANK:DB00802', type=node_types.CHEMICAL_SUBSTANCE) # Alfentanyl
     results = mychem.get_gene_by_drug(node)
-    assert len(results) > 0
+    ids = [n.id for e,n in results]
+    assert 'UNIPROTKB:P35372' in ids

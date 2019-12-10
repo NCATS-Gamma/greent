@@ -12,6 +12,7 @@ def quickgo(rosetta):
     return quickgo
 
 def test_xontology_relationships(quickgo):
+    """Check that Mast Cell Chemotaxis process is associated with Mast Cells"""
     #Mast Cell Chemotaxis
     r = quickgo.go_term_to_cell_xontology_relationships (KNode("GO:0002551", type=node_types.BIOLOGICAL_PROCESS))
     assert len(r) == 1
@@ -20,6 +21,7 @@ def test_xontology_relationships(quickgo):
     assert r[0][1].id == 'CL:0000097'
 
 def test_extensions(quickgo):
+    """Check that positive regulation of action potential is associated with cardiac muscle cells; midbrain dopaminergic neuron"""
     #positive regulation of action potential
     r = quickgo.go_term_to_cell_annotation_extensions (KNode("GO:0045760", type=node_types.BIOLOGICAL_PROCESS))
     types = set([n.type for e,n in r])
@@ -30,32 +32,9 @@ def test_extensions(quickgo):
         assert len(myedges) == 1
         assert myedges[0][0].standard_predicate is not None
 
-def xtest_extensions_long(quickgo):
-    #positive regulation of action potential
-    r = quickgo.go_term_to_cell_annotation_extensions (KNode("GO:0044267", type=node_types.BIOLOGICAL_PROCESS))
-    #types = set([n.type for e,n in r])
-    assert len(r) > 0
-    #assert node_types.CELL in types
-    #for cell_id in ['CL:0000746', 'CL:2000097']:
-    #    myedges = list(filter( lambda en: en[1].id==cell_id, r))
-    #    assert len(myedges) == 1
-    #    assert myedges[0][0].standard_predicate is not None
-
-#We no longer rely on this quickgo function.
-def _test_reverse_extensions(quickgo):
-    r = quickgo.cell_to_go_term_annotation_extensions(KNode("CL:0002189", type=node_types.CELL))
-    assert len(r) > 0
-    types = set([n.type for e,n in r])
-    assert len(types) == 1
-    assert node_types.BIOLOGICAL_PROCESS_OR_ACTIVITY in types
-    print( r )
-    #myedges = list(filter( lambda en: en[1].id=='GO:0017080' , r))
-    #assert len(myedges) == 1
-    #assert myedges[0][0].standard_predicate is not None
-    #assert myedges[0][1].name=='sodium channel regulator activity'
-
 
 def test_extensions_bp(quickgo):
+    """Check that neurotransmitter secretion happens in a range of neurons"""
     #Neurotransmitter secretion
     r = quickgo.go_term_to_cell_annotation_extensions (KNode("GO.BIOLOGICAL_PROCESS:0007269", type=node_types.BIOLOGICAL_PROCESS))
     types = set([n.type for e,n in r])
@@ -69,13 +48,15 @@ def test_extensions_bp(quickgo):
 
 
 def test_go_to_gene(quickgo):
+    """Check that we retrieve genes for a biological process"""
     r = quickgo.go_term_to_gene_annotation (KNode("GO:0007165", type=node_types.BIOLOGICAL_PROCESS))
     for e,k in r:
         assert k.type == node_types.GENE
     assert len(r) > 25
 
 
-def test_go_to_cellular_component(quickgo):
+def test_gene_to_cellular_component(quickgo):
+    """Check that we retrieve Cellular Components for a gene"""
     r = quickgo.gene_to_cellular_component(KNode('UniProtKB:P30518', type = node_types.GENE))
     for e,k in r:
         assert k.type == node_types.CELLULAR_COMPONENT

@@ -7,6 +7,7 @@ def hpo2():
     return HPO2(ServiceContext.create_context())
 
 def test_lookup(hpo2):
+    """Test that HPO can be used to search lexically, and find text synonyms"""
     terms1=hpo2.search('Arrhythmias, Cardiac')
     terms2=hpo2.search('CARDIAC ARRHYTHMIAS')
     assert len(terms1) == len(terms2) == 1
