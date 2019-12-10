@@ -55,7 +55,6 @@ classes:
       - PHAROS.DRUG
       - DRUG.INTERACTION
       - CTD
-      - UNIPROTKB
       - METABOLON
       - FOOD
 
@@ -93,7 +92,6 @@ classes:
 
   gene product:
     id_prefixes:
-      - UNIPROTKB
       - GTOPDB
       - PR
 
@@ -572,6 +570,10 @@ slots:
       - CTD:decreases^RNA splicing
       - CTD:decreases^splicing
 
+  modifies splicing of:
+    mappings:
+      - GTEx:modifies_splicing_of
+
   affects stability of:
     mappings:
       - CTD:affects_stability_of
@@ -814,6 +816,7 @@ slots:
       - RO:0002304 # causally upstream of, positive  effect
       - RO:0002305 # causally upstream of, negative  effect
       - RO:0002418 # causally upstream of or within
+      - RO:0003302 #Causes or contributes to
 
   related to:
     mappings:
@@ -1009,7 +1012,6 @@ slots:
     description: >-
       holds between a drug and a disease or phenotype that can be caused by the drug
     mappings:
-     - RO:0003302 #Causes or contributes to
      - Aeolus:0000001
 
   contraindicated for:

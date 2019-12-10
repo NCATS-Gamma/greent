@@ -10,8 +10,11 @@ def foodb(rosetta):
     foodb = rosetta.core.foodb
     return foodb
 
+#The tests in this file are not good.
+#If they rely on this data file, then it needs to be pulled from somewhere or be part of the repository.
 
-def test_load_foods(foodb: FooDB):
+
+def _test_load_foods(foodb: FooDB):
     # load up the foods.csv file
     home = os.environ.get('ROBOKOP_HOME')
     results = foodb.load_all_foods(f'{home}/robokop-interfaces/crawler/foods.csv')
@@ -19,7 +22,7 @@ def test_load_foods(foodb: FooDB):
     assert results
 
 
-def test_food_to_chemical_substance(foodb: FooDB):
+def _test_food_to_chemical_substance(foodb: FooDB):
     # load up the foods.csv file
     home = os.environ.get('ROBOKOP_HOME')
     food_list = foodb.load_all_foods(f'{home}/robokop-interfaces/crawler/foods.csv')

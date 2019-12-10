@@ -10,6 +10,8 @@ def hgnc():
     hgnc = HGNC(ServiceContext.create_context())
     return hgnc
 
+#the HGNC class should no longer be used, replaced by initial or service synonyms
+
 '''
 The function being tested has been removed.
 def test_ncbi_to_uniprot(hgnc):
@@ -23,18 +25,18 @@ def test_ncbi_to_uniprot(hgnc):
     assert Text.un_curie(node.identifier) == 'P10721'
     '''
 
-def test_synonym(hgnc):
+def _test_synonym(hgnc):
     ncbigene = 'NCBIGENE:3815'
     syns = hgnc.get_synonyms(ncbigene)
     curies = [Text.get_curie(s.identifier).upper() for s in syns]
     for c in ['NCBIGENE','OMIM','UNIPROTKB','ENSEMBL','HGNC']:
         assert c in curies
 
-def test_uniprot(hgnc):
+def _test_uniprot(hgnc):
     uniprot='UniProtKB:Q96RI1'
     syns = [s.identifier for s  in hgnc.get_synonyms(uniprot) ]
     assert 'HGNC:7967' in syns
 
-def test_rnacentral(hgnc):
+def _test_rnacentral(hgnc):
     rna='RNAcentral:URS00000C7662_9606'
     syns = [s.identifier for s in hgnc.get_synonyms(rna)]

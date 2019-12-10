@@ -44,7 +44,7 @@ def test_id_prefixes(rosetta):
     concept_model = rosetta.type_graph.concept_model
     assert concept_model.get(node_types.CHEMICAL_SUBSTANCE).id_prefixes == concept_model.get(node_types.DRUG).id_prefixes
     assert concept_model.get(node_types.CHEMICAL_SUBSTANCE).id_prefixes == concept_model.get(node_types.METABOLITE).id_prefixes
-    assert concept_model.get(node_types.GENE).id_prefixes == ['HGNC','NCBIGENE','ENSEMBL','UniProtKB','EC','RNAcentral','MGI','ZFIN']
+    assert concept_model.get(node_types.GENE).id_prefixes == ['HGNC','NCBIGENE','ENSEMBL','UNIPROTKB','EC','RNAcentral','MGI','ZFIN','HGNC.SYMBOL','IUPHAR']
     assert concept_model.get(node_types.CELL).id_prefixes == ['CL','UMLS']
     #anatomical entity has its own prefixes uberon & umls, so they come first
     # after that, it's made up of cellular component( go ), cell (cl, umls) and gross anatomical structure (uberon, po, fao)

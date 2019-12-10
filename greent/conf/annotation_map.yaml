@@ -38,6 +38,12 @@ ChemicalAnnotator:
         - smiles:
             source: "SMILES"
             data_type: string
+        - pubchem.orig_smiles:
+            source: "orig_smiles"
+            data_type: string
+        - simple_smiles:
+            source: "simple_smiles"
+            data_type: string
     KEGG:
         url: "http://rest.kegg.jp/get/"
         keys:
@@ -90,7 +96,7 @@ ChemicalAnnotator:
             source: "formula"
             data_type: string
         - mass:  
-            source: "mass" # ambigious molecular / exact 
+            source: "mass" # ambigious molecular / exact
             data_type: float
         - inchi:
             source: "inchi"
@@ -100,6 +106,12 @@ ChemicalAnnotator:
             data_type: string
         - smiles:
             source: "smiles"
+            data_type: string
+        - chebi.orig_smiles:
+            source: "orig_smiles"
+            data_type: string
+        - simple_smiles:
+            source: "simple_smiles"
             data_type: string
     MYCHEM:
         url: "https://mychem.info/v1/chem/"

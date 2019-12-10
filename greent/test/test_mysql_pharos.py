@@ -75,16 +75,17 @@ def test_disease_get_gene(pharos,rosetta):
 def test_disease_gene_mondo(pharos,rosetta):
     d_node = KNode('MONDO:0008903', type=node_types.DISEASE)
     rosetta.synonymizer.synonymize(d_node)
-    print(d_node.synonyms)
     output = pharos.disease_get_gene(d_node)
     identifiers = [ output_i[1].id for output_i in output ]
-    assert 'HGNC:188' in identifiers
+    assert 'HGNC:9884' in identifiers #RB1
+    assert 'HGNC:6407' in identifiers #KRAS
 
 def test_gene_get_disease(pharos):
     gnode = KNode('HGNC:13006',type=node_types.GENE)
     results = pharos.gene_get_disease(gnode)
     identifiers = [(r[1].id,r[1].name) for r in results]
-    assert len(identifiers)==9
+    #This used to be 9 but lowered when we excluded Expression data.
+    assert len(identifiers)==3
     assert ('DOID:305','Carcinoma') in identifiers
-    assert ('DOID:3857','medulloblastoma, large-cell') in identifiers
+    assert ('DOID:11383','Cryptorchidism') in identifiers
 

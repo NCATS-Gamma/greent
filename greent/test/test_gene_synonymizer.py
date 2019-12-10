@@ -12,17 +12,13 @@ def test_uniprot(rosetta):
     assert len(hgnc) == 1
     assert hgnc.pop() == 'HGNC:8856'
     assert node.id == 'HGNC:8856'
-    assert node.name == 'PEX14'
 
 def test_crappy_uniprot(rosetta):
-    """Do we correctly synonymize if all we have is a UniProtKB identifier?"""
+    """Do we correctly synonymize if all we have is a Trembl?.  We're ignoring trembls"""
     node = KNode('UniProtKB:A0A024QZH5', type=node_types.GENE)
     rosetta.synonymizer.synonymize(node)
     hgnc = node.get_synonyms_by_prefix('HGNC')
-    assert len(hgnc) == 1
-    assert hgnc.pop() == 'HGNC:18859'
-    assert node.id == 'HGNC:18859'
-    assert node.name == 'SPHK2'
+    assert len(hgnc) == 0
 
 def test_failing_uniprot(rosetta):
     """Do we correctly synonymize if all we have is a UniProtKB identifier?"""
@@ -32,7 +28,6 @@ def test_failing_uniprot(rosetta):
     assert len(hgnc) == 1
     assert hgnc.pop() == 'HGNC:7939'
     assert node.id == 'HGNC:7939'
-    assert node.name == 'NPPA'
 
 def test_failing_uniprot_2(rosetta):
     """Do we correctly synonymize if all we have is a UniProtKB identifier?"""
@@ -42,17 +37,16 @@ def test_failing_uniprot_2(rosetta):
     assert len(hgnc) == 1
     assert hgnc.pop() == 'HGNC:3023'
     assert node.id == 'HGNC:3023'
-    assert node.name == 'DRD2'
 
 def test_hgnc(rosetta):
     """Observed an error for this id, is it transient?"""
     node = KNode('HGNC:8599', type=node_types.GENE)
     rosetta.synonymizer.synonymize(node)
     hgnc = node.get_synonyms_by_prefix('HGNC')
-    assert node.name == 'PANX1'
+    #assert node.name == 'PANX1'
 
-def test_hgnc_label(rosetta):
-    """Do I get a label back?"""
+def _test_hgnc_label(rosetta):
+    """Do I get a label back?  This has changed - we no longer expect one"""
     node = KNode('HGNC:18729', type=node_types.GENE)
     rosetta.synonymizer.synonymize(node)
     hgnc = node.get_synonyms_by_prefix('HGNC')

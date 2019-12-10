@@ -12,13 +12,29 @@ remover = SaltRemover(defnData='[Cl,Br,K,I,Na,O]')
 
 chems = []
 n = 0
-with open('smiles.txt','r') as inf, open('simpler.txt','w') as outf:
+with open('smiles.txt','r') as inf, open('simpler_nodes.csv','w') as outf_nodes, open('simpler_edges.csv','w') as outf_edges:
+    # write out the header records for KGX
+    outf_nodes.write(f'id,name,smiles,category\n')
+    outf_edges.write(f'subject,edge_label,object\n')
+
+    # used for the
+    gamma_counter = 0
+
     for line in inf:
-        n+=1
-        if n % 10000 == 0:
-            print(n)
         x = line.strip().split('\t')
+
+        if x[1] == 'None':
+            continue
+        else:
+            name = x[1]
+
+        n+=1
+
+#        if n % 10000 == 0:
+            #print(n)
+
         cid = x[0]
+
         #this set of identifiers causes rdkit to segfault :(
         # given the number of things in the list, a better strategy than run it till it dies, and try
         # again is probably advisable
@@ -33,24 +49,41 @@ with open('smiles.txt','r') as inf, open('simpler.txt','w') as outf:
         #           'CHEBI:29422','CHEBI:29440','CHEBI:29796','CHEBI:29880','CHEBI:30126',
         #           'CHEBI:30238']:
         #    continue
-        smiles = x[2]
-        if smiles == '[empty]':
+
+        orig_smiles = x[2]
+
+        if orig_smiles == '[empty]':
             continue
         try:
-            mol = Chem.MolFromSmiles(smiles)
+            mol = Chem.MolFromSmiles(orig_smiles)
         except Exception as e:
-            print(f"error with {smiles}. Proceeding")
+            print(f"error with {orig_smiles}. Proceeding")
             continue
+
         if mol is None:
             #Couldn't parse
             continue
         try:
-            print(f'{cid}\t{smiles}')
+            #print(f'{cid}\t{smiles}')
             molp = rdMolStandardize.ChargeParent(mol)
             RemoveStereochemistry(molp)
-            newsmi = Chem.MolToSmiles(molp)
+            new_smiles = Chem.MolToSmiles(molp)
             #chems.append(chem)
-            outf.write(f"{cid}\t{smiles}\t{newsmi}\n")
+
+            # outf_nodes.write(f'id,name,smiles,category\n')
+            # outf_edges.write(f'subject,edge_label,object\n')
+
+            if orig_smiles != new_smiles:
+                print(f'{cid} not equal. old:{orig_smiles} new:{new_smiles}')
+
+                outf_nodes.write(f"{cid},\"{name}\",\"{orig_smiles}\",chemical_substance\n")
+
+                outf_edges.write(f'{cid},equivalent_smiles,gamma_smiles:{gamma_counter}\n')
+
+                outf_nodes.write(f"gamma_smiles:{gamma_counter},\"{name}\",\"{new_smiles}\",chemical_substance\n")
+
+                gamma_counter = gamma_counter+1
+
         except Exception as e:
             print(f"error with {x}")
             #exit()

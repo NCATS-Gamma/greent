@@ -172,7 +172,7 @@ class QuickGo(Service):
                 predicate = self.get_predicate(r['qualifier'])
                 if predicate is None:
                     continue
-                gene_node = KNode( uniprotid, type=node_types.GENE_PRODUCT )
+                gene_node = KNode( uniprotid, type=node_types.GENE )
                 edge = self.create_edge(node, gene_node, 'quickgo.go_term_to_gene_annotation',node.id,predicate,url = url)
                 results.append( (edge,gene_node ) )
         return results
@@ -193,7 +193,7 @@ class QuickGo(Service):
                 predicate = self.get_predicate(r['qualifier'])
                 if predicate is None:
                     continue
-                gene_node = KNode( uniprotid, type=node_types.GENE_PRODUCT )
+                gene_node = KNode( uniprotid, type=node_types.GENE )
                 edge = self.create_edge(gene_node, node, 'quickgo.go_term_to_gene_annotation',node.id,predicate,url = url)
                 results.append( (edge,gene_node ) )
         return results

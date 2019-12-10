@@ -28,10 +28,6 @@ def test_bogus_syn(oxo):
     curieset = oxo.get_synonymous_curies('EFO:9999999')
     assert len(curieset) == 0
 
-def test_go(oxo):
-    cs = oxo.get_synonymous_curies('GO:0004674')
-    print(len(cs))
-    assert(0)
 
 def test_synonyms(oxo):
     curieset = oxo.get_synonymous_curies('EFO:0000764')

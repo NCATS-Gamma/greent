@@ -8,11 +8,13 @@ def uniprot():
     uniprot = UniProt(ServiceContext.create_context())
     return uniprot
 
+#We are no longer including TREMBL in our synonyms. 
+
 def test_uniprot_both(uniprot):
     uni = 'UniProtKB:A0A024QZH5'
     results = uniprot.get_synonyms(uni)
-    assert len(results) == 1
-    assert results[0] == 'NCBIGene:56848'
+    assert len(results) == 0
+    #assert results[0] == 'NCBIGene:56848'
 
 def test_uniprot_fail(uniprot):
     uni = 'UniProtKB:A0A024QZH5'
@@ -25,8 +27,8 @@ def test_uniprot_fail(uniprot):
 def test_uniprot(uniprot):
     uni = 'UniProtKB:A0A096LNX8'
     hgncs = uniprot.uniprot_2_hgnc(uni)
-    assert len(hgncs) == 1
-    assert hgncs[0] == 'HGNC:19869'
+    assert len(hgncs) == 0
+    #assert hgncs[0] == 'HGNC:19869'
     #curies = [Text.get_curie(s.identifier).upper() for s in syns]
     #for c in ['NCBIGENE','OMIM','UNIPROTKB','ENSEMBL','HGNC']:
     #    assert c in curies

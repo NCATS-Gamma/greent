@@ -32,6 +32,7 @@ class GTExBuilder:
         # create static edge labels for variant/gtex and gene/gtex edges
         self.variant_gtex_label = LabeledID(identifier=f'GTEx:affects_expression_in', label=f'affects expression in')
         self.gene_gtex_label = LabeledID(identifier=f'gene_to_expression_site_association', label=f'gene to expression site association')
+        self.variant_gene_sqtl_label = LabeledID(identifier=f'GTEx:modifies_splicing_of', label=f'modifies splicing of')
 
         # get a ref to the util class
         self.gtu = GTExUtils(self.rosetta)
@@ -44,11 +45,20 @@ class GTExBuilder:
     # param process_raw_data: bool - flag to gather and process raw GTEx data files
     # param process_for_cache: bool - flag to process the GTEx file and load the redis cache with it
     # param process_for_graph: bool - flag to process the GTEx file and load the neo4j graph with it
+    # param is_sqtl: bool - flag to indicate if we're talking about sqtl or eqtl, default to eqtl
+    # param gtex_version: int - the version of gtex data to load
     # returns: object, pass if it is None, otherwise an exception object to indicate what failed
     #####################
-    def load(self, data_directory: str, out_file_name: str = 'sqtl_signifpairs.csv', process_raw_data: bool = True, process_for_cache: bool = True, process_for_graph: bool = True) -> object:
+    def load(self, data_directory: str, out_file_name: str = None, process_raw_data: bool = True, process_for_cache: bool = True, process_for_graph: bool = True, is_sqtl: bool = False, gtex_version: int = 8) -> object:
         # init the return value
         ret_val = None
+
+        #set default output file names if not provided
+        if not out_file_name:
+            if is_sqtl:
+                out_file_name = 'sqtl_signif_pairs.csv'
+            else:
+                out_file_name = 'eqtl_signif_pairs.csv'
 
         # does the output directory exist
         if not os.path.isdir(data_directory):
@@ -60,7 +70,7 @@ class GTExBuilder:
 
             # process the GTEx tissue files if requested
             if process_raw_data is True:
-                ret_val: object = self.gtu.process_gtex_files(data_directory, out_file_name)
+                ret_val: object = self.gtu.process_gtex_files(data_directory, out_file_name, gtex_version=gtex_version, is_sqtl=is_sqtl)
             else:
                 logger.info("Raw GTEx data processing not selected.")
 
@@ -78,7 +88,7 @@ class GTExBuilder:
                     if ret_val is None:
                         if process_for_graph is True:
                             # call the GTEx builder to load the cache and graph database
-                            ret_val: object = self.create_gtex_graph(data_directory, out_file_name, 'GTEx')
+                            ret_val: object = self.create_gtex_graph(data_directory, out_file_name, f'GTEx.v{gtex_version}', is_sqtl=is_sqtl)
                         else:
                             logger.info("Graph node/edge processing not selected.")
                     else:
@@ -91,15 +101,19 @@ class GTExBuilder:
         # return to the caller
         return ret_val
 
+    # a wrapper function to load sqtl instead of eqtl
+    def load_sqtl(self, data_directory: str, out_file_name: str = 'sqtl_signif_pairs.csv', process_raw_data: bool = True, process_for_cache: bool = True, process_for_graph: bool = True, gtex_version: int = 8):
+        self.load(data_directory, out_file_name, process_raw_data=process_raw_data, process_for_cache=process_for_cache, process_for_graph=process_for_graph, is_sqtl=True, gtex_version=gtex_version)
+
     #######
     # create_gtex_graph - Parses the CSV file(s) and inserts the data into the graph DB
     #
     # param data_directory: str - the name of the directory the file is in
     # param associated_file_names: list - list of file names to process
-    # param analysis_id: str - the name of the data source
+    # param namespace: str - the name of the data source
     # returns: object, pass if it is none, otherwise an exception object
     #######
-    def create_gtex_graph(self, data_directory: str, file_name: str, analysis_id: str) -> object:
+    def create_gtex_graph(self, data_directory: str, file_name: str, namespace: str, is_sqtl=False) -> object:
         # init the return value
         ret_val: object = None
 
@@ -158,7 +172,7 @@ class GTExBuilder:
                             curie_ensembl = f'ENSEMBL:{ensembl}'
 
                             # create variant, gene and GTEx nodes with the HGVS, ENSEMBL or UBERON expression as the id and name
-                            variant_node = KNode(curie_hgvs, name=curie_hgvs, type=node_types.SEQUENCE_VARIANT)
+                            variant_node = KNode(curie_hgvs, name=hgvs, type=node_types.SEQUENCE_VARIANT)
                             gene_node = KNode(curie_ensembl, type=node_types.GENE)
                             gtex_node = KNode(curie_uberon, name=tissue_name, type=node_types.ANATOMICAL_ENTITY)
 
@@ -167,29 +181,32 @@ class GTExBuilder:
                             self.rosetta.synonymizer.synonymize(gene_node)
                             self.rosetta.synonymizer.synonymize(gtex_node)
 
-                            # get the SequenceVariant object filled in with the sequence location data
-                            # seq_var_data = self.gtu.get_sequence_variant_obj(variant_id)
-
-                            # add properties to the variant node
-                            # variant_node.properties['sequence_location'] = [seq_var_data.build, str(seq_var_data.chrom), str(seq_var_data.pos)]
-
-                            # for now insure that the gene node has a name after synonymization
+                            # for now ensure that the gene node has a name after synonymization
                             # this can happen if gene is not currently in the graph DB
                             if gene_node.name is None:
-                                gene_node.name = curie_ensembl
+                                gene_node.name = ensembl
 
-                            # get the polarity of slope to get the direction of expression.
-                            # positive value increases expression, negative decreases
-                            label_id, label_name = self.gtu.get_expression_direction(slope)
+                            # try to switch variant node names to RSIDs
+                            rsids = variant_node.get_labeled_ids_by_prefix('DBSNP')
+                            if rsids:
+                                variant_node.name = next(iter(rsids)).label
 
-                            # create the edge label predicate for the gene/variant relationship
-                            predicate = LabeledID(identifier=label_id, label=label_name)
+                            if is_sqtl:
+                                # sqtl variant to gene always uses the same predicate
+                                predicate = self.variant_gene_sqtl_label
+                            else:
+                                # for eqtl use the polarity of slope to get the direction of expression.
+                                # positive value increases expression, negative decreases
+                                label_id, label_name = self.gtu.get_expression_direction(slope)
+
+                                # create the edge label predicate for the gene/variant relationship
+                                predicate = LabeledID(identifier=label_id, label=label_name)
 
                             # get a MD5 hash int of the composite hyper edge ID
                             hyper_edge_id = self.gtu.get_hyper_edge_id(uberon, ensembl, Text.un_curie(variant_node.id))
 
                             # set the properties for the edge
-                            edge_properties = [ensembl, pval_nominal, slope, analysis_id]
+                            edge_properties = [ensembl, pval_nominal, slope, namespace]
 
                             ##########################
                             # data details are ready. write all edges and nodes to the graph DB.
@@ -231,19 +248,35 @@ class GTExBuilder:
 
 #######
 # Main - Stand alone entry point for testing
+"""
+if __name__ == '__main__':
+    # create a new builder object
+    gtb = GTExBuilder(Rosetta())
+
+    # directory to write/read GTEx data to process
+    # working_data_directory = '.'
+    # working_data_directory = '/projects/stars/var/GTEx/stage/smartBag/example/GTEx/GTEx_data'
+    working_data_directory = f'{os.environ["ROBOKOP_HOME"]}/gtex_knowledge/'
+    
+    # load up the eqtl GTEx data with default settings
+    rv = gtb.load(working_data_directory)
+     
+    # or use some optional parameters
+    # out_file_name specifies the name of the combined and processed gtex cvs (eqtl_signif_pairs.csv)
+    # process_raw_data creates that file - specify the existing file name and set to False if one exists
+    rv = gtb.load(working_data_directory, 
+        out_file_name='example_eqtl_output.csv', 
+        process_raw_data=True, 
+        process_for_cache=True, 
+        process_for_graph=True,
+        gtex_version=8)
+     
+    # or load the sqtl data (you can use the same optional parameters)
+    rv = gtb.load_sqtl(working_data_directory)
+
+    # check the return, output error if found
+    if rv is not None:
+        logger.error(rv)
+        raise rv
+"""
 #######
-# if __name__ == '__main__':
-#     # create a new builder object
-#     gtb = GTExBuilder(Rosetta())
-#
-#     # directory with GTEx data to process
-#     working_data_directory = '.'
-#     # working_data_directory = '/projects/stars/var/GTEx/stage/smartBag/example/GTEx/GTEx_data'
-#
-#     # load up all the GTEx data
-#     rv = gtb.load(working_data_directory, out_file_name='gtex_sample.csv', process_raw_data=False, process_for_cache=False, process_for_graph=True)
-#
-#     # check the return, output error if found
-#     if rv is not None:
-#         logger.error(rv)
-#         raise rv
