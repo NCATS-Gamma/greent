@@ -1,16 +1,16 @@
 import json
-from greent.cachedservice import CachedService
+from greent.service import Service
 from greent.util import LoggingUtil
 from greent.graph_components import KNode, KEdge, LabeledID
-
+import requests
 
 logger = LoggingUtil.init_logging(__name__)
 
-class Onto(CachedService):
+class Onto(Service):
     """ An abstraction for generic questions about ontologies. """
     def __init__(self, name, context):
-        super(Onto,self).__init__(name, context)
         self.name = name
+        super(Onto, self).__init__(self.name, context)
     def get_ids(self):
         obj = self.get(f"{self.url}/id_list/{self.name.upper()}")
         return obj
@@ -90,3 +90,13 @@ class Onto(CachedService):
                         node.id,
                         predicate), new_node))
         return results
+
+    def get(self, url):
+        try:
+            response = requests.get(url)
+            if response.status_code == 200:
+                return response.json()
+            else :
+                logger.error(f"ERROR : Unexpected response calling {url} - {response.content.decode()}")
+        except Exception as ex:
+            logger.error(f'ERROR : calling {url} cause {ex} ')
