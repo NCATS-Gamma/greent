@@ -7,6 +7,7 @@ from crawler.program_runner import load_all
 from crawler.disease_phenotype import load_diseases_and_phenotypes
 from crawler.omni import create_omnicache,update_omnicache
 from datetime import datetime as dt
+from crawler.service_based_crawler import run_per_service
 import argparse
 
 def poolrun(type1,type2,rosetta,identifier_list=None):
@@ -118,6 +119,10 @@ def run(args):
     elif args.annotate:
         print('annotate')
         load_annotations(rosetta)
+    elif args.service:
+        if args.service in rosetta.core.lazy_loader: 
+            print(f"Trying to get everything from {args.service}")
+            run_per_service(args.service, rosetta)
     else:
         print(f'crawl from {args.source} to {args.target}')
         poolrun(args.source, args.target,rosetta)
@@ -135,6 +140,7 @@ if __name__=='__main__':
     parser.add_argument('--source', help='type from which to build')
     parser.add_argument('--target', help='type to which to build')
     parser.add_argument('-A', '--annotate', help='Preform adding annotation data to cache', action='store_true')
+    parser.add_argument('-sv', '--service', help='Build graph for service')
     args = parser.parse_args()
     run(args)
 

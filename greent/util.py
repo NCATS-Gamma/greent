@@ -135,7 +135,7 @@ class Resource:
     def load_yaml (path):
         result = None
         with open (path, 'r') as stream:
-            result = yaml.load (stream.read ())
+            result = yaml.load (stream.read (), Loader= yaml.FullLoader)
         return result
     
     def get_resource_obj (resource_name, format='json'):
