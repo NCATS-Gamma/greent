@@ -140,7 +140,7 @@ def specs_from_array_of_ids(pathway, identifier_list, end_name, end_id):
             current_index += 2
     return all_specs
 
-def run(pathway, start_name, start_id, end_name, end_id, supports, config, identifier_list = []):
+def run(pathway, start_name, start_id, end_name, end_id, supports, config, identifier_list = [], op_filter = lambda x: True):
     """Programmatic interface.  Pathway defined as in the command-line input.
        Arguments:
          pathway: A string defining the query.  See command line help for details
@@ -160,7 +160,7 @@ def run(pathway, start_name, start_id, end_name, end_id, supports, config, ident
     print(spec)
     q = Question(spec)
     rosetta = setup(config)
-    programs = q.compile(rosetta, disconnected_graph= disconnected_graph)
+    programs = q.compile(rosetta, disconnected_graph= disconnected_graph, op_filter= op_filter)
     
     for p in programs:
         p.run_program()
