@@ -34,12 +34,14 @@ pipeline {
         CACHE_PORT="${params.CACHE_PORT}"
         CACHE_PASSWORD="${params.CACHE_PASSWORD}"
 
-        TRANSLATOR_SERVICES_ROSETTAGRAPH_URL="bolt://${NEO4J_HOST}:${NEO4J_BOLT_PORT}
-        TRANSLATOR_SERVICES_ROSETTAGRAPH_NEO4J_PASSWORD="${NEO4J_PASSWORD}
+        TRANSLATOR_SERVICES_ROSETTAGRAPH_URL="bolt://${NEO4J_HOST}:${NEO4J_BOLT_PORT}"
+        TRANSLATOR_SERVICES_ROSETTAGRAPH_NEO4J_PASSWORD="${NEO4J_PASSWORD}"
     }
     stages {
         stage ('setup logs dir') {
-            sh "mkdir -p ${ROBOKOP_HOME}/logs"
+            steps {
+                sh "mkdir -p ${ROBOKOP_HOME}/logs"
+            }
         } 
         stage ('run tests') {
             steps {
