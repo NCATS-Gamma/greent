@@ -51,7 +51,7 @@ class Rosetta:
 
         """ Load configuration. """
         with open(config_file, 'r') as stream:
-            self.config = yaml.load(stream)
+            self.config = yaml.load(stream, Loader= yaml.FullLoader)
         self.operators = self.config["@operators"]
         self.type_checks = self.config["@type_checks"]
 

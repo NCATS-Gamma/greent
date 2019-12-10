@@ -1,10 +1,10 @@
 import requests
 import json
 
-robokop_host = 'https://robokop.renci.org'
 
 
-def fill_path(path, parameters):
+
+def fill_path(path, parameters, robokop_host):
     """
     Generates a new string with the path variables filled in
     :param path: URL template from swagger.
@@ -20,7 +20,7 @@ def resolve_example_schema(spec, path):
     else:
         return spec.get(path[0], {}).get('example', {})
 
-def format_requests(spec):
+def format_requests(spec, robokop_host):
     to_send = []
     for path, meta in spec['paths'].items():
         for request_method in meta:
@@ -35,13 +35,13 @@ def format_requests(spec):
             to_send.append({
                 'method': request_method,
                 'body': body,
-                'path': fill_path(path, parameters=params)
+                'path': fill_path(path, parameters=params, robokop_host=robokop_host)
             })
     return to_send
 
 
-def make_requests(spec, exclude_path):
-    to_send = format_requests(spec)
+def make_requests(spec, exclude_path, robokop_host = 'https://robokop.renci.org'):
+    to_send = format_requests(spec, robokop_host= robokop_host)
     errors = []
     for r in to_send:
         if r['path'] in exclude_path:
@@ -70,7 +70,7 @@ def make_requests(spec, exclude_path):
     return errors
 
 
-def test_endpoints(get_swagger_docs, excluded_path):
-    errors = make_requests(get_swagger_docs, excluded_path)
-    print(json.dumps(errors))
+def test_endpoints(get_swagger_docs, excluded_path, robokop_host):
+    errors = make_requests(get_swagger_docs, excluded_path, robokop_host)
+    print(json.dumps(errors, indent=2))
     assert len(errors) == 0

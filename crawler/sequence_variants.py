@@ -35,18 +35,32 @@ def load_gwas_knowledge(rosetta: object, limit: int = None):
             if limit and counter == limit:
                 break
 
-def load_gtex_knowledge(rosetta: object, gtex_filenames=[]):
+def load_gtex_knowledge(rosetta: object):
     # create a new builder object
     gtb = GTExBuilder(rosetta)
 
-    # directory with GTEx data to process
-    gtex_data_directory = f'{os.environ["ROBOKOP_HOME"]}/gtex_knowledge/'
+    # directory to write/read GTEx data to process
+    working_data_directory = f'{os.environ["ROBOKOP_HOME"]}/gtex_knowledge/'
+    
+    # load up the eqtl GTEx data with default settings
+    rv = gtb.load(working_data_directory)
+     
+    # check the return, output error if found
+    if rv is not None:
+        logger.error(rv)
 
-    # assign the name of the GTEx data file
-    #associated_file_names = gtex_filenames if gtex_filenames else [default_gtex_file]
-
-    # load up all the GTEx data
-    rv = gtb.load(gtex_data_directory, process_raw_data=False)
+    # or use some optional parameters
+    # out_file_name specifies the name of the combined and processed gtex cvs (eqtl_signif_pairs.csv)
+    # process_raw_data creates that file - specify the existing file name and set to False if one exists
+    #rv = gtb.load(working_data_directory, 
+    #    out_file_name='eqtl_signif_pairs.csv', 
+    #    process_raw_data=True, 
+    #    process_for_cache=True, 
+    #    process_for_graph=True,
+    #    gtex_version=8)
+     
+    # or load the sqtl data (you can use the same optional parameters)
+    rv = gtb.load_sqtl(working_data_directory)
 
     # check the return, output error if found
     if rv is not None:
@@ -66,6 +80,14 @@ def get_all_variants_and_synonymns(rosetta: object) -> list:
 
 def get_gwas_knowledge_variants_from_graph(rosetta: object) -> list:
     custom_query = 'match (s:sequence_variant)-[x]-(d:disease_or_phenotypic_feature) where "gwascatalog.sequence_variant_to_disease_or_phenotypic_feature" in x.edge_source return distinct s.id'
+    gwas_lids = []
+    var_list = query_the_graph(rosetta, custom_query)
+    for variant in var_list:
+        gwas_lids.append(LabeledID(variant[0], variant[0]))
+    return gwas_lids
+
+def get_gwas_builder_variants_from_graph(rosetta: object) -> list:
+    custom_query = 'match (s:sequence_variant)-[x]-(d:disease_or_phenotypic_feature) where "OBH_Builder" in x.edge_source return distinct s.id'
     gwas_lids = []
     var_list = query_the_graph(rosetta, custom_query)
     for variant in var_list:

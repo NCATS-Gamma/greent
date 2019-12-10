@@ -8,6 +8,7 @@ from crawler.sequence_variants import get_all_variant_ids_from_graph
 from json import loads
 from greent.graph_components import KNode
 from greent.util import Text
+from crawler.service_based_crawler import get_supported_types
 import requests
 
 # There's a tradeoff here: do we want these things in the database or not.  One big problem
@@ -29,10 +30,10 @@ bad_idents = conf.get('bad_identifiers')
 def get_label(curie, url='https://onto.renci.org/label/'):
     y = {'label': ''}
     try:        
-        y.update(requests.get(f'{url}/{curie}').json())
+        y.update(requests.get(f'{url}{curie}').json())
         return y
     except Exception as e:
-        print(e)
+        print(f"error calling {url}{curie} - to get labels")
         return y
 
 def get_identifiers(input_type,rosetta):
@@ -172,7 +173,7 @@ def get_identifiers(input_type,rosetta):
         # pull Biological process decendants
         identifiers = requests.get('https://onto.renci.org/descendants/GO:0008150').json()
         # merge with molucular activity decendants
-        identifiers = identifiers + requests.get('https://onto.renci.org/descendants/GO:0003674').json()        
+        identifiers = identifiers + requests.get('https://onto.renci.org/descendants/GO:0003674').json()
         for ident in identifiers:
             if ident not in bad_idents:
                 p = get_label(ident) #requests.get(f'https://onto.renci.org/label/{ident}/')
@@ -201,21 +202,24 @@ def get_identifiers(input_type,rosetta):
 
     return lids
 
-def do_one(itype,otype,identifier):
+def do_one(itype, otype, op_list, identifier):
     path = f'{itype},{otype}'
+    op_filter = lambda x: True
+    if not op_list == None:
+        op_filter = lambda x: x in op_list    
     print(path)
     if type(identifier) != type([]):
         print('Passing single identifier per program')
-        run(path,identifier.label,identifier.identifier,None,None,None,'greent.conf')
+        run(path,identifier.label,identifier.identifier,None,None,None,'greent.conf', op_filter= op_filter)
     else:
         print('passing chunk of identifiers for a program')
-        run(path,'','',None,None,None,'greent.conf', identifier_list = identifier)
-     
-def load_all(input_type,output_type,rosetta,poolsize,identifier_list=None):
+        run(path,'','',None,None,None,'greent.conf', identifier_list = identifier, op_filter= op_filter)
+
+def load_all(input_type,output_type,rosetta,poolsize,identifier_list=None , op_list = None):
     """Given an input type and an output type, run a bunch of workflows dumping results into neo4j and redis"""
     identifiers = identifier_list if (identifier_list != None) else get_identifiers(input_type,rosetta)
     print( f'Found {len(identifiers)} input {input_type}')
-    partial_do_one = partial(do_one, input_type, output_type)
+    partial_do_one = partial(do_one, input_type, output_type, op_list)
     pool = Pool(processes=poolsize)
     chunks = poolsize*2
     chunksize = int(len(identifiers)/chunks)

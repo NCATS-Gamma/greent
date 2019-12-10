@@ -348,7 +348,7 @@ class Question(FromDictMixin):
             response[e_id] = new_edge
         return response
 
-    def compile(self, rosetta, disconnected_graph = False):
+    def compile(self, rosetta, disconnected_graph = False, op_filter = lambda x: True):
         plan = None
         if not disconnected_graph:
             plans = self.get_transitions(rosetta.type_graph, self.generate_concept_cypher())
@@ -363,9 +363,9 @@ class Question(FromDictMixin):
             # remove duplicate transitions
             for source_id in plan:
                 for target_id in plan:
-                    plan[source_id][target_id] = {t['op']:t for t in plan[source_id][target_id]}.values()
+                    plan[source_id][target_id] = {t['op']:t for t in plan[source_id][target_id] if op_filter(t['op'])}.values()
         else:
-            plan = self.get_transitions_disconnected(rosetta.type_graph)
+            plan = self.get_transitions_disconnected(rosetta.type_graph, op_filter)
         if not plan:
             raise RuntimeError('No viable programs.')
 
@@ -375,7 +375,7 @@ class Question(FromDictMixin):
     
         return programs
 
-    def get_transitions_disconnected(self, graph):
+    def get_transitions_disconnected(self, graph, op_filter):
         """
         Function adjusted for crawler works on the assumptions that quetion contains 
         unform types of  pairs of nodes which we don't have pair to pair connections.
@@ -401,5 +401,5 @@ class Question(FromDictMixin):
         p = {}
         for edge in self.query_graph['edges']:
             p[edge.source_id] = {}
-            p[edge.source_id][edge.target_id] = {e['op']: e for e in edges}.values()
+            p[edge.source_id][edge.target_id] = {e['op']: e for e in edges if op_filter(e['op'])}.values()
         return p
