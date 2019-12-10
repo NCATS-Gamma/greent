@@ -18,12 +18,15 @@ def ontology():
                            ontology_file)
 
 def test_label(ontology):
+    """Retrieve label for ontology term"""
     assert ontology.label('MONDO:0005737') == "Ebola hemorrhagic fever"
 
 def test_is_a(ontology):
+    """Check whether one term is a subclass of another"""
     assert ontology.is_a('MONDO:0005737', 'MONDO:0005762')
 
 def test_xrefs(ontology):
+    """Access db xrefs of an ontology term"""
     xrefs = ontology.xrefs('MONDO:0005737')
     xref_ids = [ x['id'] for x in xrefs ]
     print (xref_ids)
@@ -31,6 +34,7 @@ def test_xrefs(ontology):
         assert i in xref_ids
 
 def test_synonyms(ontology):
+    """Access equivalent IDs.  This will mostly work for MONDO. Other ontologies are less clear about equivalence."""
     syns = ontology.synonyms ('MONDO:0005737')
     received = []
     for s in syns:
@@ -41,8 +45,11 @@ def test_synonyms(ontology):
         assert expected in received
 
 def test_search(ontology):
+    """Look up terms via name.  It's in the interface, but we get better results in other ways"""
     result = ontology.search ('ebola', ignore_case=True)
     assert result[0]['id'] == 'MONDO:0005737'
+
 def test_lookup(ontology):
+    """Look up terms via equivalent ID.  It's in the interface, but we get better results in other ways"""
     result = ontology.lookup ('UMLS:C0282687')
     assert result[0]['id'] == 'MONDO:0005737'

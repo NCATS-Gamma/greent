@@ -4,11 +4,13 @@ from greent.conftest import rosetta
 
 
 def test_parents(rosetta):
+    """Test that we can correctly read the biolink model and find the parent of DIESEASE"""
     concept_model = rosetta.type_graph.concept_model
     parent = concept_model.get_parent(node_types.DISEASE)
     assert parent == node_types.DISEASE_OR_PHENOTYPIC_FEATURE
 
 def test_get_children(rosetta):
+    """Test that we can correctly read the biolink model and find the children of DISEASE_OR_PHENOTYPIC_FEATURE"""
     concept_model = rosetta.type_graph.concept_model
     children = concept_model.get_children(node_types.DISEASE_OR_PHENOTYPIC_FEATURE)
     assert len(children) == 2
@@ -16,17 +18,20 @@ def test_get_children(rosetta):
     assert node_types.PHENOTYPIC_FEATURE in children
 
 def test_genetic_condition(rosetta):
+    """Test that we can correctly read the biolink model and find the children of DISEASE"""
     concept_model = rosetta.type_graph.concept_model
     children = concept_model.get_children(node_types.DISEASE)
     assert len(children) == 1
     assert node_types.GENETIC_CONDITION in children
 
 def test_DOPF(rosetta):
+    """Test that we can correctly read the biolink model and find the parent of DISEASE_OR_PHENOTYPIC_FEATURE"""
     concept_model = rosetta.type_graph.concept_model
     parent = concept_model.get_parent(node_types.DISEASE_OR_PHENOTYPIC_FEATURE)
     assert parent == node_types.BIOLOGICAL_ENTITY
 
 def test_named_thing_to_disease(rosetta):
+    """Test that we can correctly read the biolink model and find parent child relations from top to bottom"""
     concept_model = rosetta.type_graph.concept_model
     children = concept_model.get_children(node_types.NAMED_THING)
     assert node_types.BIOLOGICAL_ENTITY in children
@@ -36,11 +41,15 @@ def test_named_thing_to_disease(rosetta):
     assert node_types.DISEASE in children
 
 def test_metabolite_children(rosetta):
+    """Test that we can correctly read the biolink model and get a reasonable result back if we ask for children
+    of a childless node."""
     concept_model = rosetta.type_graph.concept_model
     children = concept_model.get_children(node_types.METABOLITE)
     assert len(children) == 0
 
 def test_id_prefixes(rosetta):
+    """Test that we can access the id_prefixes defined in the biolink model for each node type that that these are
+    correctly propagated up the type hierarchy."""
     concept_model = rosetta.type_graph.concept_model
     assert concept_model.get(node_types.CHEMICAL_SUBSTANCE).id_prefixes == concept_model.get(node_types.DRUG).id_prefixes
     assert concept_model.get(node_types.CHEMICAL_SUBSTANCE).id_prefixes == concept_model.get(node_types.METABOLITE).id_prefixes

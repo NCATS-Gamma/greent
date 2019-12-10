@@ -17,6 +17,7 @@ def hetio(rosetta):
 # prefix, or url or anything.
 
 def test_gene_to_anatomy(hetio):
+    """Check that the gene LONP is related to 10-20 anatomy terms, which are all uberons, one of which is the digestive system """
     relations = hetio.gene_to_anatomy(KNode('NCBIGENE:83752', type=node_types.GENE))
     assert len(relations) < 20 and len(relations) > 10
     identifiers = [node.id for r,node in relations]
@@ -26,6 +27,7 @@ def test_gene_to_anatomy(hetio):
     assert 'UBERON:0001007' in identifiers
 
 def test_anatomy_to_gene(hetio):
+    """Check that the digestiv system is related to genes, and one of them is LONP"""
     relations = hetio.anatomy_to_gene(KNode('UBERON:0001007', type=node_types.ANATOMICAL_ENTITY))
     nts = [node.type for r,node in relations]
     for nt in nts:
@@ -37,7 +39,7 @@ def test_anatomy_to_gene(hetio):
 
 
 def test_gene_to_disease(hetio):
-    #KRT7 associated with bile duct cancer?
+    """Test gene to disease association, by spot checking that KRT7 is associated with bile duct cancer"""
     relations = hetio.gene_to_disease(KNode('NCBIGENE:3855', type=node_types.GENE))
     assert len(relations) < 20 and len(relations) > 10
     identifiers = [node.id for r,node in relations]
@@ -47,6 +49,7 @@ def test_gene_to_disease(hetio):
     assert 'DOID:4606' in identifiers
 
 def test_disease_to_symptom(hetio):
+    """Test disease to pheno association, by spot checking that Crohn's is associated with skin manifestations"""
     #Crohn's disease has associated Skin Manifesations?
     relations = hetio.disease_to_phenotype(KNode('DOID:8778', type=node_types.DISEASE))
     identifiers = [node.id for r,node in relations]

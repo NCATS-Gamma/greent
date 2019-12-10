@@ -4,6 +4,7 @@ from greent.conftest import rosetta
 from greent import node_types
 
 def test_neuron(rosetta):
+    """check that oxo synonymizes a CL identifier to Mesh (and FMA)"""
     node = KNode("CL:0000540", type=node_types.CELL)
     synonymize(node,rosetta.core)
     assert len(node.synonyms) >  5
@@ -14,7 +15,7 @@ def test_neuron(rosetta):
     #We used to get a UMLS, but OXO isn't giving us that for some reason...
     umlscell = node.get_synonyms_by_prefix("FMA")
     mid = list(umlscell)[0]
-    assert mid == 'FMA:54527' \
+    assert mid == 'FMA:54527'
 
 def test_phenotype(rosetta):
     """Check that we're getting back results from meddra.  Because we're limiting to distance=1 from oxo, we're
@@ -27,6 +28,8 @@ def test_phenotype(rosetta):
     print(hpsyns)
 
 def test_names(rosetta):
+    """Check that we are synonymzing HP to UMLS.  This is deprecated (we are handling phenotype synonyms outside of OXO)
+    and will go away in the future."""
     node = KNode('HP:0002527', type=node_types.PHENOTYPIC_FEATURE, name='Falls')
     synonymize(node,rosetta.core)
     print( node.synonyms )

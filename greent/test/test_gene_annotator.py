@@ -12,6 +12,9 @@ def gene_annotator(rosetta):
     return gene_annotator
 
 def test_ensembl_gene_annotation(gene_annotator):
+    """Tests pulling the annotations down from ensembl and spot checks a couple to
+    make sure that they have names, locations, and types.   This will be better as a
+    test performed at annotation time"""
     all_ensembl_annotations = gene_annotator.get_all_ensembl_gene_annotations()
     assert len(all_ensembl_annotations) > 65000
 
@@ -28,6 +31,8 @@ def test_ensembl_gene_annotation(gene_annotator):
     assert single_gene_annotations['gene_biotype'] == 'protein_coding'
 
 def test_combined_gene_annotation(gene_annotator):
+    """A test making sure that we can annotate particular genes.  The genes have an hgnc
+    id, so the annotator needs to find the ensembl id."""
     # gene_annotator.annotate - these are coming from the cache after the first time
 
     gene_node = KNode('HGNC:9604', type=node_types.GENE)

@@ -12,34 +12,35 @@ def hmdb(rosetta):
     return hmdb
 
 def test_metabolite_to_disease_with_syn(rosetta,hmdb):
-    #chem = KNode('CHEBI:84268', type = node_types.CHEMICAL_SUBSTANCE)
-    #chem = KNode('CHEBI:18357', type = node_types.CHEMICAL_SUBSTANCE)
-    chem = KNode('CHEBI:88492', type = node_types.CHEMICAL_SUBSTANCE)
+    """Check that D-glucose is associted with T2D"""
+    chem = KNode('CHEBI:4167', type = node_types.CHEMICAL_SUBSTANCE)
     rosetta.synonymizer.synonymize(chem)
     results = hmdb.metabolite_to_disease(chem)
     for e,n in results:
-        print(f'*{n.id}*')
         rosetta.synonymizer.synonymize(n)
-    assert True
+    ids = [n.id for e,n in results]
+    assert "MONDO:0005148" in ids
 
 def test_metabolite_to_enzyme_with_syn(rosetta,hmdb):
+    """Check chemical->gene; is caffiene associated with PED4B"""
     chem = KNode('CHEBI:27732', type=node_types.CHEMICAL_SUBSTANCE)
     rosetta.synonymizer.synonymize(chem)
-    print(chem.synonyms)
     results = hmdb.metabolite_to_enzyme(chem)
     assert len(results) > 0
+    assert 'UniProtKB:Q07343'  in [n.id for e,n in results]
 
-#This one is returning no results because our current mondo doesn't map T2D to any UMLS :(
-def x_test_diabetes_to_metabolite(rosetta,hmdb):
+def test_diabetes_to_metabolite(rosetta,hmdb):
+    """Disease -> metabolite.   T2D -> Uric Acid"""
     diabetes = KNode('MONDO:0005148', type=node_types.DISEASE)
     rosetta.synonymizer.synonymize(diabetes)
     print(diabetes.synonyms)
     results = hmdb.disease_to_metabolite(diabetes)
     assert len(results) > 0
-    #node_labels=[node.name for edge,node in results]
-    #assert '5-HETE' in node_labels
+    node_labels=[node.name for edge,node in results]
+    assert 'Uric acid' in node_labels
 
 def test_disease_to_metabolite(hmdb):
+    """Test Asthma -> 5-HETE"""
     asthma = KNode('UMLS:C0004096', type=node_types.DISEASE)
     results = hmdb.disease_to_metabolite(asthma)
     assert len(results) > 0
@@ -47,6 +48,7 @@ def test_disease_to_metabolite(hmdb):
     assert '5-HETE' in node_labels
 
 def test_enzyme_to_metabolite(hmdb):
+    """Gene -> metabolite.   GPX7->5-HETE"""
     asthma = KNode('UniProtKB:Q96SL4', type=node_types.GENE)
     results = hmdb.enzyme_to_metabolite(asthma)
     assert len(results) > 0
@@ -66,6 +68,7 @@ def _test_pathway_to_metabolite(hmdb):
 
 
 def test_metabolite_to_disease(hmdb):
+    """Metabolite->Disease,  5-HETE -> asthma"""
     hete = KNode('HMDB:HMDB0011134', type=node_types.CHEMICAL_SUBSTANCE)
     results = hmdb.metabolite_to_disease(hete)
     assert len(results) > 0
@@ -73,6 +76,7 @@ def test_metabolite_to_disease(hmdb):
     assert 'Asthma' in node_labels
 
 def test_metabolite_to_enzyme(hmdb):
+    """Metabolite->Gene,  5-HETE -> GPX7"""
     hete = KNode('HMDB:HMDB0011134', type=node_types.CHEMICAL_SUBSTANCE)
     results = hmdb.metabolite_to_enzyme(hete)
     assert len(results) > 0

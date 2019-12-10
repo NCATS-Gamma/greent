@@ -30,6 +30,7 @@ def ensembl(rosetta):
     return ensembl
 
 def test_synonymization(rosetta, clingen):
+    """Check variant synonymization, which mostly occurs through the ClinGen Allele Registry (CAID)"""
     variant_node = KNode('CAID:CA128085', type=node_types.SEQUENCE_VARIANT)
     rosetta.synonymizer.synonymize(variant_node)
     assert 'HGVS:NC_000012.12:g.111803962G>A' in variant_node.get_synonyms_by_prefix('HGVS')
@@ -76,7 +77,7 @@ def test_synonymization(rosetta, clingen):
     assert 'DBSNP:rs369602258' in synonyms_2
 
 def test_sequence_variant_to_gene(myvariant):
-
+    """Check that myvariant can correctly return genes that are near variants or that the variant is in """
     variant_node = KNode('MYVARIANT_HG19:chr7:g.55241707G>T', type=node_types.SEQUENCE_VARIANT)
     relations = myvariant.sequence_variant_to_gene(variant_node)
     identifiers = [node.id for r,node in relations]
@@ -116,6 +117,7 @@ def test_sequence_variant_to_gene(myvariant):
     assert 'SO:0001629' in pids
 
 def test_batch_sequence_variant_to_gene(myvariant):
+    """Check that we can call myvariant using batches and retrieve genes"""
     variant_node = KNode('MYVARIANT_HG38:chr11:g.68032291C>G', type=node_types.SEQUENCE_VARIANT)
     variant_node2 = KNode('MYVARIANT_HG38:chrX:g.32389644G>A', type=node_types.SEQUENCE_VARIANT)
     variant_node3 = KNode('MYVARIANT_HG38:chr17:g.7674894G>A', type=node_types.SEQUENCE_VARIANT)
@@ -143,6 +145,7 @@ def test_batch_sequence_variant_to_gene(myvariant):
     assert 'is_nonsense_variant_of' in plabels
 
 def test_biolink(rosetta, biolink):
+    """Check biolink variant->disease connections"""
     variant_node = KNode('HGVS:NC_000023.9:g.32317682G>A', type=node_types.SEQUENCE_VARIANT)
     rosetta.synonymizer.synonymize(variant_node)
     assert 'CLINVARVARIANT:94623' in variant_node.get_synonyms_by_prefix('CLINVARVARIANT')
@@ -246,6 +249,7 @@ def future_test_get_variants_by_region(clingen):
     assert 'CAID:CA19752509' in identifiers
 
 def test_sequence_variant_to_gene_ensembl(rosetta, ensembl, clingen):
+    """Check finding genes near variants using ensembl gene locations"""
     # using hg38
     node = KNode('CAID:CA279509', type=node_types.GENE)
     robokop_variant_id = f'ROBO_VARIANT:HG38|17|58206171|58206172|A'
@@ -288,6 +292,7 @@ def test_sequence_variant_to_gene_ensembl(rosetta, ensembl, clingen):
     assert 'ENSEMBL:ENSG00000011021' in identifiers
 
 def test_sequence_variant_ld(ensembl):
+    """Check using ensembl API to find variants in LD with one another"""
     node = KNode('DBSNP:rs1042779', type=node_types.SEQUENCE_VARIANT)
     relations = ensembl.sequence_variant_to_sequence_variant(node)
     identifiers = [node.id for r,node in relations]

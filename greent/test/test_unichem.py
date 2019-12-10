@@ -10,6 +10,7 @@ def unichem():
     return unichem
 
 def test_chembl_input (unichem):
+    """Look up synonyms in unichem"""
     q = UniChem (ServiceContext.create_context ())
     synonyms = unichem.get_synonyms("CHEMBL:CHEMBL12")
     assert len(synonyms) == 4
@@ -19,6 +20,7 @@ def test_chembl_input (unichem):
     assert 'PUBCHEM:3016' in synonyms
 
 def test_chebi_input (unichem):
+    """Look up synonyms in unichem"""
     q = UniChem (ServiceContext.create_context ())
     synonyms = unichem.get_synonyms("CHEBI:49575")
     assert len(synonyms) == 4
@@ -28,6 +30,7 @@ def test_chebi_input (unichem):
     assert 'PUBCHEM:3016' in synonyms
 
 def test_unknown_curie(unichem):
+    """Look up synonyms in unichem with a bogus id produces an empty list"""
     q = UniChem (ServiceContext.create_context ())
     synonyms = unichem.get_synonyms("DruggyDrug:49575")
     assert len(synonyms) == 0
