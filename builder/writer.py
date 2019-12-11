@@ -30,19 +30,7 @@ writer = BufferedWriter(rosetta)
 
 
 def callback_wrapper(ch, method, properties, body):
-    ## This is basically going to create a thread for the handler and call it , and let it finish.
-    ## to avoid blocking the rabbit heartbeat. 
-    # Found out that rabbitmq will reset connections for channels 
-    # and sometimes it is the case that neo4j related things take time 
-    # and the broker decides this client is no longer active and kills the connection
-    # so to avoid dropping of any incoming data that might, have not been written we can
-    # tell the queue that we've processed them if we still have the channel open
-    # else we will just leave them on the queue. 
-    thrd = threading.Thread(target= callback, args= [body])
-    while thrd.is_alive():
-        # just to keep the connection alive
-        ch._connection.sleep('0.01')
-        # let's acknowledge after the thread completes
+    callback(body)
     ch.basic_ack(method.delivery_tag)
 
 def callback(body):
