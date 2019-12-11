@@ -32,7 +32,7 @@ class GTExBuilder:
         # create static edge labels for variant/gtex and gene/gtex edges
         self.variant_gtex_label = LabeledID(identifier=f'GTEx:affects_expression_in', label=f'affects expression in')
         self.gene_gtex_label = LabeledID(identifier=f'gene_to_expression_site_association', label=f'gene to expression site association')
-        self.variant_gene_sqtl_label = LabeledID(identifier=f'GTEx:modifies_splicing_of', label=f'modifies splicing of')
+        self.variant_gene_sqtl_label = LabeledID(identifier=f'GTEx:affects_splicing_of', label=f'affects splicing of')
 
         # get a ref to the util class
         self.gtu = GTExUtils(self.rosetta)
