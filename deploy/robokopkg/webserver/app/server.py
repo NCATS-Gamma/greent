@@ -23,7 +23,7 @@ def get_list_of_neo4j_files():
             files.append(filename)
     # return sorted so recent files show up first on UI
     # select *.dump.db as the neo4j dumps
-    files = list(filter(lambda x : x.endswith('.dump.db', files)))
+    files = list(filter(lambda x : x.endswith('.dump.db'), files))
     return sorted(files, reverse= True)
 
 def get_change_log(dump_file_name):
