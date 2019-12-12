@@ -19,6 +19,7 @@ pipeline {
         TEST_BUILDER = 'test_builder_api.py'
         TEST_RANKER = 'test_ranker_api.py'
         TEST_MANAGER = 'test_manager.py'
+        TEST_UBERON_GRAPH= 'test_uber_graph.py'
 
         ROBOKOP_HOME="${params.ROBOKOP_HOME}"
         OMNICORP_HOST="${params.OMNICORP_HOST}"
@@ -83,6 +84,16 @@ pipeline {
                     post {
                         failure {
                             echo "Failed on Pubmed Cache."
+                        }
+                    }
+                }
+                stage ('Monitoring UberonGraph ') {
+                    steps {
+                        sh "pytest monitoring/${TEST_UBERON_GRAPH}"
+                    }
+                    post {
+                        failure {
+                            echo "Failed on UberonGraph"
                         }
                     }
                 }

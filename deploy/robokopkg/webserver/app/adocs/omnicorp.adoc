@@ -1,0 +1,3 @@
+== Robokop Redis Dump
+
+The dump of the recent version of the robokop request cache can be downloaded <a href="{{host + '/'}}dump.rdb">here</a>. 

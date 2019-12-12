@@ -19,6 +19,6 @@ def excluded_path():
     ]
 
 
-def test_builder(get_swagger_docs, excluded_path):
+def test_messenger(get_swagger_docs, excluded_path):
 
     monitoring.swagger_based_test.test_endpoints(get_swagger_docs, excluded_path, robokop_host = robokop_host)

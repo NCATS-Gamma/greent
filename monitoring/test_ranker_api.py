@@ -14,9 +14,10 @@ def get_swagger_docs():
 @pytest.fixture()
 def excluded_path():
     return [
-        "https://robokop.renci.org/ranker/api/node_properties/"
+        "https://robokop.renci.org/ranker/api/node_properties/",
+        "https://robokop.renci.org/ranker/api/task/"
     ]
 
 
-def test_builder(get_swagger_docs, excluded_path):
+def test_ranker(get_swagger_docs, excluded_path):
     monitoring.swagger_based_test.test_endpoints(get_swagger_docs, excluded_path)
