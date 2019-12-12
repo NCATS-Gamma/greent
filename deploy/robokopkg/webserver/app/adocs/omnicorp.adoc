@@ -1,3 +1,5 @@
-== Robokop Redis Dump
+== Robokop Omnicorp Dump
 
-The dump of the recent version of the robokop request cache can be downloaded <a href="{{host + '/'}}dump.rdb">here</a>. 
+++++
+The dump of the recent version of the robokop omnicorp database cache can be downloaded <a href="{{host + '/'}}omnicorp.sql">here</a>. 
+++++

@@ -78,7 +78,7 @@ MATCH (a:chemical_substance {id:"CHEBI:5118"}) RETURN a
 <p>
 Note that all of these entities shared some properties. Each contains an id property in the form of a CURIE.  Each contains a "name" property with a human-readable name (which is not guaranteed to be unique).  Each also contains an "equivalent_identifiers" property.  The array value contains a number of other CURIEs that should be considered equivalent to the primary identifier.  To find the primary identifier given any other identifier, you can use the synonymizer tool <a href="http://ROBOKOP.renci.org/simple/synonymize" target="blank">here</a>.
 </p>
-----
+
 
 
 ++++

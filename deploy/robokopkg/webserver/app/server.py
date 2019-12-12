@@ -16,12 +16,14 @@ def get_domain_name_from_env():
     proto = request.environ.get('HTTP_X_FORWARDED_PROTO','https')
     return f'{proto}://{domain_name}'
 
-def get_list_of_files():
+def get_list_of_neo4j_files():
     files = []
     for dirname, dirnames, filenames in os.walk(dumps_dir):
         for filename in filenames:
             files.append(filename)
     # return sorted so recent files show up first on UI
+    # select *.dump.db as the neo4j dumps
+    files = list(filter(lambda x : x.endswith('.dump.db', files)))
     return sorted(files, reverse= True)
 
 def get_change_log(dump_file_name):
@@ -39,7 +41,7 @@ def guide():
 
 @app.route('/guide/dumps')
 def dumps():
-    files = get_list_of_files()
+    files = get_list_of_neo4j_files()
     
     y = {'files' : [{'filename': x ,'changelog': get_change_log(x)} for x in files]}
     print(y)
@@ -62,3 +64,11 @@ def queries():
 @app.route('/guide/licenses')
 def licenses():
     return render_template('guide/licenses.html',**{'host': get_domain_name_from_env()})
+
+@app.route('/guide/redis_dump')
+def redis_dump():
+    return render_template('guide/redis.html', **{'host': get_domain_name_from_env()})
+
+@app.route('/guide/omnicorp_dump')
+def omni_dump():
+    return render_template('guide/omnicorp.html', **{'host': get_domain_name_from_env()})
