@@ -4,10 +4,11 @@ import os
 import requests
 import base64
 
+TIME_OUT = 1 #second
 
 @pytest.fixture()
 def db_driver():
-    return GraphDatabase.driver(uri=f"bolt://{os.environ.get('NEO4J_HOST')}:{os.environ.get('NEO4J_BOLT_PORT')}", auth=('neo4j', os.environ['NEO4J_PASSWORD']))
+    return GraphDatabase.driver(uri=f"bolt://{os.environ.get('NEO4J_HOST')}:{os.environ.get('NEO4J_BOLT_PORT')}", auth=('neo4j', os.environ['NEO4J_PASSWORD']), connection_timeout = TIME_OUT)
 
 @pytest.fixture()
 def neo_http_host():
@@ -41,7 +42,8 @@ def test_http(neo_http_host, headers):
     url = f"{neo_http_host}/db/data"
     errors = requests.get(
         url= url,
-        headers = headers
+        headers = headers,
+        timeout= TIME_OUT
     ).json().get('errors',[])
     assert errors == []
 
@@ -49,6 +51,7 @@ def test_https(neo_https_host, headers):
     url = f'{neo_https_host}/db/data'
     errors = requests.get(
         url= url,
-        headers = headers
+        headers = headers,
+        timeout = TIME_OUT
     ).json().get('errors', [])
     assert errors == []

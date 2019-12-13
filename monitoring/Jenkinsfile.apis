@@ -42,6 +42,8 @@ pipeline {
         CACHE_HOST="${params.CACHE_HOST}"
         CACHE_PORT="${params.CACHE_PORT}"
         CACHE_PASSWORD="${params.CACHE_PASSWORD}"
+        
+        NOTIFICATION_RECIPIENTS="${params.NOTIFICATION_RECIPIENTS}"
 
     }
     stages {
@@ -53,7 +55,7 @@ pipeline {
                     }
                     post {
                         failure {
-                            echo "failed on Ranker."
+                            sh "python monitoring/notify.py -e ${NOTIFICATION_RECIPIENTS} -m 'Ranker is failing.' -s ${BUILD_TAG}"
                         }
                     }
                 }
@@ -63,7 +65,7 @@ pipeline {
                     } 
                     post {
                         failure {
-                            echo "Failed on Builder."
+                            sh "python monitoring/notify.py -e ${NOTIFICATION_RECIPIENTS} -m 'Builder is failing.' -s ${BUILD_TAG}"
                         }
                     }
                 }
@@ -73,7 +75,7 @@ pipeline {
                     }
                     post {
                         failure {
-                            echo "Failed on Messenger."
+                            sh "python monitoring/notify.py -e ${NOTIFICATION_RECIPIENTS} -m 'Messenger is failing.' -s ${BUILD_TAG}"
                         }
                     }
                 }
@@ -83,7 +85,7 @@ pipeline {
                     }
                     post {
                         failure {
-                            echo "Failed on Pubmed Cache."
+                            sh "python monitoring/notify.py -e ${NOTIFICATION_RECIPIENTS} -m 'Manager is failing.' -s ${BUILD_TAG}"
                         }
                     }
                 }

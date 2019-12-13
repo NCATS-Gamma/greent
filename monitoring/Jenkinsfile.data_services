@@ -43,6 +43,7 @@ pipeline {
         CACHE_PORT="${params.CACHE_PORT}"
         CACHE_PASSWORD="${params.CACHE_PASSWORD}"
 
+        NOTIFICATION_RECIPIENTS="${params.NOTIFICATION_RECIPIENTS}"
     }
     stages {
         stage ('Run Tests') {
@@ -53,7 +54,7 @@ pipeline {
                     }
                     post {
                         failure {
-                            echo "failed on neo4j."
+                            sh "python monitoring/notify.py -e ${NOTIFICATION_RECIPIENTS} -m 'Neo4j is failing.' -s ${BUILD_TAG}"
                         }
                     }
                 }
@@ -63,7 +64,7 @@ pipeline {
                     } 
                     post {
                         failure {
-                            echo "Failed on redis."
+                            sh "python monitoring/notify.py -e ${NOTIFICATION_RECIPIENTS} -m 'Redis is failing.' -s ${BUILD_TAG}"
                         }
                     }
                 }
@@ -73,7 +74,7 @@ pipeline {
                     }
                     post {
                         failure {
-                            echo "Failed on omnicorp."
+                            sh "python monitoring/notify.py -e ${NOTIFICATION_RECIPIENTS} -m 'Omnicorp is failing.' -s ${BUILD_TAG}"
                         }
                     }
                 }
@@ -83,7 +84,7 @@ pipeline {
                     }
                     post {
                         failure {
-                            echo "Failed on Pubmed Cache."
+                            sh "python monitoring/notify.py -e ${NOTIFICATION_RECIPIENTS} -m 'Pubmed is failing.' -s ${BUILD_TAG}"
                         }
                     }
                 }
@@ -93,7 +94,7 @@ pipeline {
                     }
                     post {
                         failure {
-                            echo "Failed on UberonGraph"
+                            sh "python monitoring/notify.py -e ${NOTIFICATION_RECIPIENTS} -m 'Uberongraph is failing.' -s ${BUILD_TAG}"
                         }
                     }
                 }

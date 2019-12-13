@@ -47,6 +47,10 @@ pipeline {
             steps {
                 sh 'pytest greent/test'
             }
+            post {
+                failure {
+                    sh "python monitoring/notify.py -e ${NOTIFICATION_RECIPIENTS} -m 'Client tests are failing.' -s ${BUILD_TAG}"                }
+            }
         }
     }
 }
