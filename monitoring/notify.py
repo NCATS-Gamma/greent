@@ -14,7 +14,7 @@ def send_mail(emails, message, subject):
 
     server = smtplib.SMTP(config['ROBOKOP_MAIL_SERVER'])
     server.login(config['ROBOKOP_MAIL_USERNAME'], config['ROBOKOP_MAIL_PASSWORD'])
-    sender = config['ROBOKOP_DEFAULT_MAIL_SENDER']
+    sender = config['ROBOKOP_MAIL_DEFAULT_SENDER']
     
     msg = MIMEText(message)
     msg['Subject'] = subject
