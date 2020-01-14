@@ -262,6 +262,11 @@ def test_sequence_variant_to_gene_ensembl(rosetta, ensembl, clingen):
     assert 'ENSEMBL:ENSG00000167419' in identifiers
     assert len(identifiers) > 20
 
+    names = [node.name for r,node in relations]
+    assert 'MKS1' in names
+    assert 'LPO' in names
+    assert 'EPX' in names
+
     # same variant with hg19
     #node = KNode('CAID:CA279509', type=node_types.GENE)
     #robokop_variant_id = f'ROBO_VARIANT:HG19|17|56283532|56283533|A'
