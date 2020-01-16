@@ -1,0 +1,7 @@
+== Robokop Redis Dump
+
+++++
+<p>
+The most recent build of our redis-cache can be downloaded <a href="{{host + '/'}}dump.rdb">here</a>.
+</p>
+++++

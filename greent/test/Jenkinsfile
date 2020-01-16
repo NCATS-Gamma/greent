@@ -7,8 +7,12 @@ pipeline {
             args "-v ${env.WORKSPACE}:/home/murphy/robokop-interfaces --entrypoint='' --network=host"
         }
     }
+    triggers{
+        cron ('* * * * */7')
+    }
     environment {
-        ROBOKOP_HOME="${params.ROBOKOP_HOME}"
+        ROBOKOP_HOME="${env.WORKSPACE}"
+        PYTHONPATH="${env.WORKSPACE}"
         OMNICORP_HOST="${params.OMNICORP_HOST}"
         OMNICORP_PORT="${params.OMNICORP_PORT}"
         OMNICORP_DB="${params.OMNICORP_DB}"
@@ -29,16 +33,28 @@ pipeline {
         CACHE_HOST="${params.CACHE_HOST}"
         CACHE_PORT="${params.CACHE_PORT}"
         CACHE_PASSWORD="${params.CACHE_PASSWORD}"
+
+        TRANSLATOR_SERVICES_ROSETTAGRAPH_URL="bolt://${NEO4J_HOST}:${NEO4J_BOLT_PORT}"
+        TRANSLATOR_SERVICES_ROSETTAGRAPH_NEO4J_PASSWORD="${NEO4J_PASSWORD}"
+        ROBOKOP_MAIL_SERVER="${params.MAIL_SERVER}"
+        NOTIFICATION_RECIPIENTS="${params.NOTIFICATION_RECIPIENTS}"        
+        ROBOKOP_MAIL_USERNAME="${params.MAIL_USERNAME}"
+        ROBOKOP_MAIL_PASSWORD="${params.MAIL_PASSWORD}"
+        ROBOKOP_MAIL_DEFAULT_SENDER="${params.MAIL_SENDER}"
     }
     stages {
-        stage ('setup env') {
+        stage ('setup logs dir') {
             steps {
-                sh '. deploy/setenv.sh'
+                sh "mkdir -p ${ROBOKOP_HOME}/logs"
             }
         } 
         stage ('run tests') {
             steps {
                 sh 'pytest greent/test'
+            }
+            post {
+                failure {
+                    sh "python monitoring/notify.py -e ${NOTIFICATION_RECIPIENTS} -m 'Client tests are failing.' -s ${BUILD_TAG}"                }
             }
         }
     }

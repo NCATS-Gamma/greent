@@ -5,6 +5,7 @@ from greent.conftest import rosetta
 
 
 def test_kegg_get_enzyme(rosetta):
+    """Test that a wrapped function name will be correctly unwrapped, and the interior function called and results produced"""
     fname='caster.input_filter(kegg~chemical_get_enzyme,metabolite)'
     func = rosetta.get_ops(fname)
     node = KNode('CHEBI:29073', name='chem',type=node_types.CHEMICAL_SUBSTANCE)
@@ -13,13 +14,15 @@ def test_kegg_get_enzyme(rosetta):
     assert len(results) > 0
 
 def test_kegg_get_enzyme_norcodeine(rosetta):
+    """Test that with a wrapped function, we can look up norcodeine and get back CYP3A4 from Kegg"""
     fname='caster.input_filter(kegg~chemical_get_enzyme,metabolite)'
     func = rosetta.get_ops(fname)
     node = KNode('CHEBI:80579', name='norcodeine',type=node_types.CHEMICAL_SUBSTANCE)
     rosetta.synonymizer.synonymize(node)
     results = func(node)
-    for edge,node in results:
-        print(edge,node.id,node.name)
+    gene_ids = [node.id for edge,node in results]
+    assert len(gene_ids) > 0
+    assert 'NCBIGene:1576' in gene_ids
 
 
 #kegg.enzyme_get_chemicals is deprecated, so we no longer need this test
@@ -34,6 +37,7 @@ def test_kegg_get_enzyme_norcodeine(rosetta):
 
 
 def test_kegg_chem_to_chem_carnitine(rosetta):
+    """Test that a wrapped function can be called, and that the result can be properly cast."""
     fname='caster.upcast(input_filter(kegg~chemical_get_chemical,metabolite),chemical_substance)'
     carn = KNode('CHEBI:16347',name='L-Carnitine',type=node_types.CHEMICAL_SUBSTANCE)
     rosetta.synonymizer.synonymize(carn)
@@ -44,17 +48,23 @@ def test_kegg_chem_to_chem_carnitine(rosetta):
     ids = []
     for edge,node in results:
         ids.append(node.id)
+        assert node.type == node_types.CHEMICAL_SUBSTANCE
     #Really, it should be, but this reaction doesn't appear in KEGG (for humans)
     assert other in ids
 
 def test_drugcentral(rosetta):
+    """Test the caster wrapping of drugcentral, which returns both diseases and phenotypes. Caster wrapping should
+    only return things that are diseases"""
     fname='caster.output_filter(mychem~get_drugcentral,disease,typecheck~is_disease)'
     func = rosetta.get_ops(fname)
     assert func is not None
     node = KNode('CHEMBL:CHEMBL159', type=node_types.CHEMICAL_SUBSTANCE)
     results = func(node)
+    assert len(results) > 0
     for e,n in results:
         assert e.provided_by=='mychem.get_drugcentral'
+        assert n.type == node_types.DISEASE
+        assert n.id.startswith('MONDO')
 
 def test_complicated(rosetta):
     """make sure that a very complicated cast gets everything to the right place"""

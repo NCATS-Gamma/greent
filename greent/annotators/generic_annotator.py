@@ -59,7 +59,10 @@ class GenericAnnotator(Annotator):
             cached_name = self.rosetta.cache.get(key)
             if not cached_name or cached_name == '':
                 self.event_loop.run_until_complete(self.set_name(node))
-
+            elif cached_name:
+                logger.debug(f'Setting good name from cache {cached_name} -- {node.id}')
+                node.name = cached_name
+                return 
             if node.name != '' :
                 #set if name is not empty 
                 self.rosetta.cache.set(key,node.name)

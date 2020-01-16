@@ -67,13 +67,13 @@ def test_chem_to_chem_codein_chebe(kegg,rosetta):
 def test_chem_to_chem_LGlutamine(kegg,rosetta):
     Glutamine = KNode('KEGG.COMPOUND:C00064',name='L-Glutamine',type=node_types.CHEMICAL_SUBSTANCE)
     rosetta.synonymizer.synonymize(Glutamine)
-    Phenylalanine = 'KEGG.COMPOUND:C00079'
+    Glutamate = 'KEGG.COMPOUND:C00025'
     results = kegg.chemical_get_chemical(Glutamine)
     ids = []
     for edge,node in results:
         ids.append(node.id)
     assert len(results) > 0
-    assert Phenylalanine in ids
+    assert Glutamate in ids
 
 def test_chem_to_chem_Glucosylceramide(kegg,rosetta):
     Glucosylceramide = KNode('KEGG.COMPOUND:C01190',name='Glucosylceramide',type=node_types.CHEMICAL_SUBSTANCE)
@@ -127,13 +127,15 @@ def test_get_reaction_1923(kegg):
 
 def test_get_reaction_1375(kegg):
     reaction = kegg.get_reaction('rn:R01375')
-    assert len(reaction['enzyme']) == 1
-    assert len(reaction['reactants']) == 2
-    assert 'C00064' in reaction['reactants']
-    assert 'C00166' in reaction['reactants']
-    assert len(reaction['products']) == 2
-    assert 'C00940' in reaction['products']
-    assert 'C00079' in reaction['products']
+    #This reaction doesn't return anything because it doesn't have an ORTHOLOGY element.
+    assert len(reaction) == 0
+    #assert len(reaction['enzyme']) == 1
+    #assert len(reaction['reactants']) == 2
+    #assert 'C00064' in reaction['reactants']
+    #assert 'C00166' in reaction['reactants']
+    #assert len(reaction['products']) == 2
+    #assert 'C00940' in reaction['products']
+    #assert 'C00079' in reaction['products']
 
 def test_get_reaction(kegg):
     reaction = kegg.get_reaction('rn:R07034')
@@ -262,7 +264,7 @@ def test_sequence_Glp(kegg):
 
 def test_one_aa_seq(kegg):
     res = kegg.get_sequence('C16008')
-    assert res == 'ISLMKRPPGF'
+    assert res == 'ISLMKRPPGFSPFR'
 
 def test_s(kegg):
     res = kegg.get_sequence('C16131')

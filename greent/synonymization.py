@@ -14,7 +14,7 @@ from greent.synonymizers import sequence_variant_synonymizer
 from builder.question import LabeledID
 
 
-logger = LoggingUtil.init_logging(__name__, level=logging.DEBUG, format='medium')
+logger = LoggingUtil.init_logging(__name__, level=logging.INFO, format='medium')
 
 class Synonymizer:
 
@@ -141,5 +141,5 @@ class Synonymizer:
             if prefix == None or prefix.upper() not in uc:
                 bad_synonyms.add(synonym)
         for bs in bad_synonyms:
-            logger.debug(f'REMOVE {bs}')
+            #logger.debug(f'REMOVE {bs}')
             node.synonyms.remove(bs)

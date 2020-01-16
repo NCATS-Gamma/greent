@@ -7,6 +7,8 @@ from greent import node_types
 from greent.util import Text
 from greent.graph import TypeGraph
 
+"""This test is unused.  The high level functional testing it describes is being moved elsewhere."""
+
 @pytest.fixture()
 def type_graph(conf):
     return TypeGraph (ServiceContext.create_context(config=conf.get('config', None)))

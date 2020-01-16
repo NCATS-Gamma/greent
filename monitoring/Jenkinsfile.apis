@@ -8,7 +8,7 @@ pipeline {
         }
     }
     triggers {
-        cron ('*/5 * * * *')
+        cron ('0 */2 * * *')
     }
     environment {
         TEST_NEO4J = 'test_neo4j_monitor.py'
@@ -42,6 +42,12 @@ pipeline {
         CACHE_HOST="${params.CACHE_HOST}"
         CACHE_PORT="${params.CACHE_PORT}"
         CACHE_PASSWORD="${params.CACHE_PASSWORD}"
+        
+        NOTIFICATION_RECIPIENTS="${params.NOTIFICATION_RECIPIENTS}"
+        ROBOKOP_MAIL_SERVER="${params.MAIL_SERVER}"
+        ROBOKOP_MAIL_USERNAME="${params.MAIL_USERNAME}"
+        ROBOKOP_MAIL_PASSWORD="${params.MAIL_PASSWORD}"
+        ROBOKOP_MAIL_DEFAULT_SENDER="${params.MAIL_SENDER}"
 
     }
     stages {
@@ -53,7 +59,7 @@ pipeline {
                     }
                     post {
                         failure {
-                            echo "failed on Ranker."
+                            sh "python monitoring/notify.py -e ${NOTIFICATION_RECIPIENTS} -m 'Ranker is failing.' -s ${BUILD_TAG}"
                         }
                     }
                 }
@@ -63,7 +69,7 @@ pipeline {
                     } 
                     post {
                         failure {
-                            echo "Failed on Builder."
+                            sh "python monitoring/notify.py -e ${NOTIFICATION_RECIPIENTS} -m 'Builder is failing.' -s ${BUILD_TAG}"
                         }
                     }
                 }
@@ -73,7 +79,7 @@ pipeline {
                     }
                     post {
                         failure {
-                            echo "Failed on Messenger."
+                            sh "python monitoring/notify.py -e ${NOTIFICATION_RECIPIENTS} -m 'Messenger is failing.' -s ${BUILD_TAG}"
                         }
                     }
                 }
@@ -83,7 +89,7 @@ pipeline {
                     }
                     post {
                         failure {
-                            echo "Failed on Pubmed Cache."
+                            sh "python monitoring/notify.py -e ${NOTIFICATION_RECIPIENTS} -m 'Manager is failing.' -s ${BUILD_TAG}"
                         }
                     }
                 }

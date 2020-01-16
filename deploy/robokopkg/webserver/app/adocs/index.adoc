@@ -41,7 +41,17 @@
 ++++
                 <div class="icon-holder">                                      
                     <a play-topic="{{host}}/guide/dumps">
-                        Browse
+                        Browse Neo4j
+                    </a>
+                </div>
+                <div class="icon-holder">                                      
+                    <a play-topic="{{host}}/guide/redis_dump">
+                        Browse Redis
+                    </a>
+                </div>
+                <div class="icon-holder">                                      
+                    <a play-topic="{{host}}/guide/omnicorp_dump">
+                        Browse Omnicorp
                     </a>
                 </div>
             </p>

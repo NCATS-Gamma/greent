@@ -62,7 +62,7 @@ class Ensembl(Service):
         (ensembl_id, gene_name, chromosome, start_pos, end_pos, gene_type, description) 
         VALUES (?,?,?,?,?,?,?);"""
         
-        self.gene_range_select_sql = """SELECT ensembl_id, start_pos, end_pos
+        self.gene_range_select_sql = """SELECT ensembl_id, gene_name, start_pos, end_pos
         FROM genes WHERE chromosome = ? AND ((? >= start_pos AND ? <= end_pos)
         OR (? >= start_pos AND ? <= end_pos) OR (? <= start_pos AND ? >= end_pos));"""
 
@@ -187,11 +187,11 @@ class Ensembl(Service):
         db_cursor.execute(self.gene_range_select_sql, (chromosome, flanking_min, flanking_min, flanking_max, flanking_max, flanking_min, flanking_max))
 
         genes_in_region = db_cursor.fetchall()
-        for gene_id_text, gene_start, gene_end in genes_in_region:
+        for gene_id_text, gene_name, gene_start, gene_end in genes_in_region:
             #cast this to make neo4j happy
             gene_id = str(gene_id_text)
             #logger.info(f'Found matching gene: {gene_id},{gene_start},{gene_end}')
-            gene_node = KNode(f'ENSEMBL:{gene_id}', name=f'{gene_id}', type=node_types.GENE)
+            gene_node = KNode(f'ENSEMBL:{gene_id}', name=f'{gene_name}', type=node_types.GENE)
             if start_position < gene_start:
                 distance = gene_start - start_position
             elif end_position > gene_end:

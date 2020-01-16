@@ -10,6 +10,7 @@ def obh(rosetta):
 	return ObesityHubBuilder(rosetta, debug=True)
 
 def test_tabix(rosetta, obh):
+	"""Check that the OBH loader can read a sugen file using the tabix index"""
 	things = []
 	filepath = 'sample_sugen.gz'
 	variants = obh.get_gwas_data_from_indexed_file(filepath, '1', 19299673, 19299673)
@@ -97,7 +98,7 @@ def _test_sugen_file_reader(rosetta, obh):
 
 	assert hit == True
 
-def test_gwas_builder(rosetta, obh):
+def _test_gwas_builder(rosetta, obh):
 	#this will actually write to neo4j
 	#create a graph with just one node / file
     #p_value_cutoff = 1e-5

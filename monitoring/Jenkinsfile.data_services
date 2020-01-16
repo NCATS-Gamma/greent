@@ -8,7 +8,7 @@ pipeline {
         }
     }
     triggers {
-        cron ('*/5 * * * *')
+        cron ('0 */2 * * *')
     }
     environment {
         TEST_NEO4J = 'test_neo4j_monitor.py'
@@ -19,6 +19,7 @@ pipeline {
         TEST_BUILDER = 'test_builder_api.py'
         TEST_RANKER = 'test_ranker_api.py'
         TEST_MANAGER = 'test_manager.py'
+        TEST_UBERON_GRAPH= 'test_uber_graph.py'
 
         ROBOKOP_HOME="${params.ROBOKOP_HOME}"
         OMNICORP_HOST="${params.OMNICORP_HOST}"
@@ -42,6 +43,11 @@ pipeline {
         CACHE_PORT="${params.CACHE_PORT}"
         CACHE_PASSWORD="${params.CACHE_PASSWORD}"
 
+        NOTIFICATION_RECIPIENTS="${params.NOTIFICATION_RECIPIENTS}"
+        ROBOKOP_MAIL_SERVER="${params.MAIL_SERVER}"
+        ROBOKOP_MAIL_USERNAME="${params.MAIL_USERNAME}"
+        ROBOKOP_MAIL_PASSWORD="${params.MAIL_PASSWORD}"
+        ROBOKOP_MAIL_DEFAULT_SENDER="${params.MAIL_SENDER}"
     }
     stages {
         stage ('Run Tests') {
@@ -52,7 +58,7 @@ pipeline {
                     }
                     post {
                         failure {
-                            echo "failed on neo4j."
+                            sh "python monitoring/notify.py -e ${NOTIFICATION_RECIPIENTS} -m 'Neo4j is failing.' -s ${BUILD_TAG}"
                         }
                     }
                 }
@@ -62,7 +68,7 @@ pipeline {
                     } 
                     post {
                         failure {
-                            echo "Failed on redis."
+                            sh "python monitoring/notify.py -e ${NOTIFICATION_RECIPIENTS} -m 'Redis is failing.' -s ${BUILD_TAG}"
                         }
                     }
                 }
@@ -72,7 +78,7 @@ pipeline {
                     }
                     post {
                         failure {
-                            echo "Failed on omnicorp."
+                            sh "python monitoring/notify.py -e ${NOTIFICATION_RECIPIENTS} -m 'Omnicorp is failing.' -s ${BUILD_TAG}"
                         }
                     }
                 }
@@ -82,7 +88,17 @@ pipeline {
                     }
                     post {
                         failure {
-                            echo "Failed on Pubmed Cache."
+                            sh "python monitoring/notify.py -e ${NOTIFICATION_RECIPIENTS} -m 'Pubmed is failing.' -s ${BUILD_TAG}"
+                        }
+                    }
+                }
+                stage ('Monitoring UberonGraph ') {
+                    steps {
+                        sh "pytest monitoring/${TEST_UBERON_GRAPH}"
+                    }
+                    post {
+                        failure {
+                            sh "python monitoring/notify.py -e ${NOTIFICATION_RECIPIENTS} -m 'Uberongraph is failing.' -s ${BUILD_TAG}"
                         }
                     }
                 }
