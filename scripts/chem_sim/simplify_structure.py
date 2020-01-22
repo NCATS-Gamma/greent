@@ -5,36 +5,26 @@ from rdkit.Chem.rdmolops import RemoveStereochemistry
 from rdkit.Chem.Fingerprints import FingerprintMols
 from rdkit.Chem.Descriptors import HeavyAtomMolWt
 from rdkit.Chem.SaltRemover import SaltRemover
-
+import pandas as pd
 
 #Putting "O" in here will unify hydrates, like morphine and morphine monohydrate (called morphine by mesh!)
 remover = SaltRemover(defnData='[Cl,Br,K,I,Na,O]')
 
 chems = []
 n = 0
-with open('smiles.txt','r') as inf, open('simpler_nodes.csv','w') as outf_nodes, open('simpler_edges.csv','w') as outf_edges:
-    # write out the header records for KGX
-    outf_nodes.write(f'id,name,smiles,category\n')
-    outf_edges.write(f'subject,edge_label,object\n')
 
-    # used for the
-    gamma_counter = 0
+df = pd.DataFrame(columns=['cid', 'smiles', 'newsmi'])
+
+
+with open('smiles.txt','r') as inf, open('simpler.txt','w') as outf:
+    outf.write(f"cid,smiles,newsmi\n")
 
     for line in inf:
-        x = line.strip().split('\t')
-
-        if x[1] == 'None':
-            continue
-        else:
-            name = x[1]
-
         n+=1
-
-#        if n % 10000 == 0:
-            #print(n)
-
+        if n % 10000 == 0:
+            print(n)
+        x = line.strip().split('\t')
         cid = x[0]
-
         #this set of identifiers causes rdkit to segfault :(
         # given the number of things in the list, a better strategy than run it till it dies, and try
         # again is probably advisable
@@ -50,40 +40,56 @@ with open('smiles.txt','r') as inf, open('simpler_nodes.csv','w') as outf_nodes,
         #           'CHEBI:30238']:
         #    continue
 
-        orig_smiles = x[2]
+        if len(x) < 3:
+            print(f'found an empty one {x}')
+            continue
 
-        if orig_smiles == '[empty]':
+        smiles = x[2]
+
+        if smiles == '[empty]':
             continue
         try:
-            mol = Chem.MolFromSmiles(orig_smiles)
+            mol = Chem.MolFromSmiles(smiles)
         except Exception as e:
-            print(f"error with {orig_smiles}. Proceeding")
+            print(f"error with {smiles}. Proceeding")
             continue
-
         if mol is None:
             #Couldn't parse
             continue
         try:
-            #print(f'{cid}\t{smiles}')
+            # print(f'{cid}\t{smiles}')
             molp = rdMolStandardize.ChargeParent(mol)
             RemoveStereochemistry(molp)
-            new_smiles = Chem.MolToSmiles(molp)
+            newsmi = Chem.MolToSmiles(molp)
             #chems.append(chem)
 
-            # outf_nodes.write(f'id,name,smiles,category\n')
-            # outf_edges.write(f'subject,edge_label,object\n')
+            df = df.append({'cid':cid,'smiles':smiles,'newsmi':newsmi}, ignore_index=True)
 
-            if orig_smiles != new_smiles:
-                print(f'{cid} not equal. old:{orig_smiles} new:{new_smiles}')
-
-                outf_nodes.write(f"{cid},\"{name}\",\"{orig_smiles}\",chemical_substance\n")
-
-                outf_edges.write(f'{cid},equivalent_smiles,gamma_smiles:{gamma_counter}\n')
-
-                outf_nodes.write(f"gamma_smiles:{gamma_counter},\"{name}\",\"{new_smiles}\",chemical_substance\n")
-
-                gamma_counter = gamma_counter+1
-
+            outf.write(f"{cid},{smiles},{newsmi}\n")
         except Exception as e:
             print(f"error with {x}")
             #exit()
+
+#df = pd.read_csv('simpler.txt', header=0, usecols=['cid', 'smiles', 'newsmi'])
+
+grps = df.groupby('newsmi')
+
+for name, group in grps:
+    print(f'\nnew smile:{name}')
+
+    for simsmi in group.smiles: print(f'{simsmi},  ')
+
+# sorted = df.sort_values(by=['newsmi'])
+#
+# last_smi = ''
+#
+# for i,j in sorted.iterrows():
+#     if j['newsmi'] != last_smi:
+#         print(f"newsmi discovered: {j['newsmi']}")
+#         last_smi = j['newsmi']
+#
+
+
+
+
+

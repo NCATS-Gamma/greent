@@ -4,7 +4,7 @@ import os
 # Maybe make this a notebook?
 
 def get_driver(url):
-    driver = GraphDatabase.driver(url, auth=("neo4j", os.environ['NEO4J_PASSWORD']))
+    driver = GraphDatabase.driver(url, auth=("neo4j", "ncatsgamma"))
     return driver
 
 def run_query(url,cypherquery):
@@ -19,8 +19,8 @@ def get_chemicals(url):
     cquery = f'''match (a:chemical_substance) where a.smiles is not NULL and a.id is not null RETURN a.id,a.name,a.smiles limit 100'''
     records = run_query(url,cquery)
     with open('smiles.tsv','w') as outf:
-        outf.write(f"id\tname\tsmiles\tcategory\n")
-        #outf.write(f"Compound_name\tCASRN\tSMILES\tSolubility(µM)\tSolubility(µg/mL)\tlogSo(mol/L)\tSource\n")
+        outf.write(f"id\tname\tsmiles\tcategory\n") # header for KGX testing
+        #outf.write(f"Compound_name\tCASRN\tSMILES\tSolubility(µM)\tSolubility(µg/mL)\tlogSo(mol/L)#\tSource\n")
 
         counter = 0
 
@@ -36,14 +36,14 @@ def get_chemicals(url):
 
 def get_chemicals_orig(url):
     """This is all the variants.  We might want to filter on source"""
-    cquery = f'''match (a:chemical_substance) where a.smiles is not NULL RETURN a.id, a.name, a.smiles limit 100'''
+    cquery = f'''match (a:chemical_substance) where a.smiles is not NULL and a.smiles <> "" and a.smiles <> "**" and a.smiles <> "*" RETURN a.id, a.name, a.smiles order by a.smiles limit 10000'''
     records = run_query(url,cquery)
     with open('smiles.txt','w') as outf:
         for r in records:
-            print(r)
+            # print(r)
             outf.write(f'{r["a.id"]}\t{r["a.name"]}\t{r["a.smiles"]}\n')
 
 
 if __name__ == '__main__':
-    url = 'bolt://robokopdev.renci.org:7687'
+    url = 'bolt://robokopdb2.renci.org:7687'
     get_chemicals_orig(url)
