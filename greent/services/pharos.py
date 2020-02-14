@@ -81,7 +81,7 @@ class Pharos(Service):
             for syno in sres:
                 if syno['href'].startswith('https://www.ebi.ac.uk/chembl/compound/inspect/'):
                     term = syno['href'].split('/')[-1]
-                    identifier = 'CHEMBL:{}'.format(term)
+                    identifier = 'CHEMBL.COMPOUND:{}'.format(term)
                     return_results.add( (identifier, drugname) )
         if foundany and len(return_results) == 0:
             print (f" unable to find drug {drugname}")
@@ -112,7 +112,7 @@ class Pharos(Service):
             if element['label'] == 'IDG Drug':
                 label = element['term']
             if element['label'] == 'CHEMBL ID':
-                chemblid = f"CHEMBL:{element['term']}"
+                chemblid = f"CHEMBL.COMPOUND:{element['term']}"
         logger.debug('out')
         return chemblid, label
 
@@ -155,7 +155,7 @@ class Pharos(Service):
     def drug_get_gene(self, subject):
         """ Get a gene from a drug. """
         resolved_edge_nodes = []
-        identifiers = subject.get_synonyms_by_prefix('CHEMBL')
+        identifiers = subject.get_synonyms_by_prefix('CHEMBL.COMPOUND')
         for s in identifiers:
             pharosid = Text.un_curie(s)
             original_edge_nodes = []
