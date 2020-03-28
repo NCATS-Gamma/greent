@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: knowledge-graph-deployment
+  labels:
+    app: robokop-kg
+    service: robokop-kg
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: robokop-kg
+  template:
+    metadata:
+      labels:
+        app: robokop-kg
+    spec:
+      containers:
+        - name: knowledge-graph-container
+          image: renciorg/neo4jkp
+          envFrom:
+            - configMapRef:
+                name: robokop-env
+          env:
+            - name: JAVA_HOME
+              value: /usr/lib/jvm/java-11-openjdk/jre
+            - name: NEO4J_AUTH
+              value: neo4j/$(NEO4J_PASSWORD)
+            - name: NEO4J_dbms_connectors_default__listen__address
+              value: 0.0.0.0
+            - name: NEO4J_dbms_security_procedures_unrestricted
+              value: apoc.*  # un-sandbox apoc procedures: http://blog.armbruster-it.de/2017/05/running-neo4j-3-2-apoc-docker/
+            - name: NEO4J_dbms_memory_heap_max__size
+              value: $(NEO4J_HEAP_MEMORY)
+            - name: NEO4J_dbms_memory_heap_initial__size
+              value: $(NEO4J_HEAP_MEMORY_INIT)
+            - name: NEO4J_dbms_memory_pagecache_size
+              value: $(NEO4J_CACHE_MEMORY)
+            - name: NEO4J_dbms_jvm_additional
+              value: "-XX:+UnlockExperimentalVMOptions -XX:+UseZGC"
+          command:
+            - /bin/sh
+          args:
+            - "-c"
+            - "chown neo4j:neo4j /ssl && /docker-entrypoint.sh neo4j"
+          ports:
+            - containerPort: 7687
+            - containerPort: 7474
+          volumeMounts:
+          - mountPath: /data
+            name: neo4j-data-volume
+          - mountPath: /logs
+            name: neo4j-logs-volume
+          - mountPath: /ssl
+            name: neo4j-ssl-volume
+      restartPolicy: Always
+      volumes:
+        - name: neo4j-data-volume
+          persistentVolumeClaim:
+            claimName: robokop-neo4j-data-pvc
+        - name: neo4j-logs-volume
+          persistentVolumeClaim:
+            claimName: robokop-neo4j-logs-pvc
+        - name: neo4j-ssl-volume
+          persistentVolumeClaim:
+            claimName: robokop-neo4j-ssl-pvc

@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: robokop-cache-deployment
+  labels:
+    app: robokop-cache
+    service: robokop-cache
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: robokop-cache
+  template:
+    metadata:
+      labels:
+        app: robokop-cache
+    spec:
+      containers:
+      - name: robokop-cache-container
+        image: redis:latest
+        envFrom:
+          - configMapRef:
+              name: robokop-env
+        ports:
+        - containerPort: 6380
+        command:
+          - "redis-server"
+        args:
+          - "--port"
+          - "$(CACHE_PORT)"
+          - "--requirepass"
+          - "$(CACHE_PASSWORD)"
+        resources:
+          requests:
+            memory: "1Gi" # alter to meet needs
+        volumeMounts:
+          - mountPath: /data
+            name: cache-volume
+      volumes:
+        - name: cache-volume
+          persistentVolumeClaim:
+            claimName: robokop-cache-pvc

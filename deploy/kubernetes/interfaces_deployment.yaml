@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: interfaces-deployment
+  labels:
+    app: robokop-interfaces
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: robokop-interfaces
+  template:
+    metadata:
+      labels:
+        app: robokop-interfaces
+    spec:
+      containers:
+      - name: interfaces-container
+        image: renciorg/robokop_interfaces:latest
+        envFrom:
+          - configMapRef:
+              name: robokop-env
+        env:
+          # use localhost since its going to be on the same pod
+          - name: BUILD_CACHE_HOST
+            value: localhost
+        ports:
+          - containerPort: 6010
+          - containerPort: 9002
+        volumeMounts:
+          - mountPath: /home/murphy/logs
+            name: logs-volume
+          - mountPath: /home/murphy/shared
+            name: shared-volume
+      - name: robokop-build-cache
+        image: redis:latest
+        envFrom:
+          - configMapRef:
+              name: robokop-env
+        command:
+          - "redis-server"
+        args:
+          - "--port"
+          - "$(BUILD_CACHE_PORT)"
+      restartPolicy: Always
+      volumes:
+        - name: logs-volume
+          persistentVolumeClaim:
+            claimName: robokop-logs-pvc
+        - name: shared-volume
+          persistentVolumeClaim:
+            claimName: robokop-shared-pvc

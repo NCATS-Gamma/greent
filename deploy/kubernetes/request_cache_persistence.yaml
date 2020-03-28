@@ -1,0 +1,27 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: PersistentVolume
+  metadata:
+    name: robokop-cache-pv
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    capacity:
+      storage: 1Gi
+    hostPath:
+      path: "/mnt/data/cache"
+    persistentVolumeReclaimPolicy: Retain
+    storageClassName: robokop-cache-pv
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: robokop-cache-pvc
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 1Gi
+    storageClassName: robokop-cache-pv
+kind: List
