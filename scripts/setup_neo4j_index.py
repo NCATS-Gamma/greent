@@ -16,7 +16,7 @@ with driver.session() as session:
     session.run(f"""CALL db.index.fulltext.createRelationshipIndex('edge_id_index', [{', '.join(f"'{predicate}'" for predicate in predicates)}], ['id'], {{analyzer: 'keyword'}})""")
 
     # node name index
-    session.run("""CALL db.index.fulltext.createNodeIndex("node_name_index", ["named_thing"], ["name"], {analyzer: "whitespace"})""")
+    session.run("""CALL db.index.fulltext.createNodeIndex("node_name_index", ["named_thing"], ["name"], {analyzer: "standard"})""")
 
     # node id indexes
     result = session.run("MATCH (n) UNWIND labels(n) as l RETURN DISTINCT l as type")
