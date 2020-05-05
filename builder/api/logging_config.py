@@ -35,13 +35,13 @@ def set_up_main_logger():
     logger.setLevel(logging.DEBUG)
     logger.addHandler(console_handler)
     logger.addHandler(file_handler)
-    logger.addHandler(smtp_handler)
+    # logger.addHandler(smtp_handler)
 
     logger = logging.getLogger('greent')
     logger.setLevel(logging.DEBUG)
     logger.addHandler(console_handler)
     logger.addHandler(file_handler)
-    logger.addHandler(smtp_handler)
+    # logger.addHandler(smtp_handler)
 
     return logger
 logger = set_up_main_logger()
