@@ -613,8 +613,16 @@ class Concepts(Resource):
                             items:
                                 type: string
         """
-        concepts = list(node_types.node_types - {'unspecified'})
-        return concepts
+        driver = GraphDatabase.driver(f"bolt://{os.environ['NEO4J_HOST']}:{os.environ['NEO4J_BOLT_PORT']}",
+                                      auth=basic_auth("neo4j", os.environ['NEO4J_PASSWORD']))
+        if not app.config.get('concepts'):
+            with driver.session() as s:
+                query = """MATCH (a) WHERE not a:Concept with labels(a) as label unwind label as l with distinct l 
+                return collect(l) as lbls"""
+                results = s.run(query).single()['lbls']
+                app.config['concepts'] = results
+        # concepts = list(node_types.node_types - {'unspecified'})
+        return app.config['concepts']
 
 api.add_resource(Concepts, '/concepts/')
 
